@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/cover__13_"
+    tools:context=".Friends.AddFriends_By_Email_Activity">
+    <!-- Close Button -->
+    <ImageView
+        android:id="@+id/todoClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/car_ui_icon_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/findfriend"
+        android:layout_width="382dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/ic_launcher_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/todoClose">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/FriendEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Type The Email .."
+            android:textColor="#211C70"
+            android:textColorHint="@color/light_blue_50" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageView
+        android:id="@+id/todoNextBtn"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+
+        android:src="@drawable/baseline_add_box_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/findfriend"
+        app:layout_constraintVertical_bias="0.114" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="You Can Send A Friend Request "
+        android:textSize="24sp"
+        android:textColor="#211C70"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/findfriend"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.695" />
+</androidx.constraintlayout.widget.ConstraintLayout>

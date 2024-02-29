@@ -39,6 +39,7 @@ android {
         jvmTarget = "1.8"
     }
 
+
 }
 
 dependencies {
@@ -46,8 +47,7 @@ dependencies {
     implementation ("androidx.fragment:fragment-ktx:1.3.0")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
-
-implementation("androidx.constraintlayout:constraintlayout")
+    implementation("androidx.constraintlayout:constraintlayout")
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.4.31")
     implementation ("com.google.firebase:firebase-firestore:23.0.0")
     implementation("androidx.core:core-ktx:1.9.0")
@@ -59,7 +59,8 @@ implementation("androidx.constraintlayout:constraintlayout")
     implementation("com.android.car.ui:car-ui-lib:2.6.0")
     implementation("com.google.firebase:firebase-database:20.3.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
-   
+ //implementation("org.tenserflow:tenserflow-lite:+")
+implementation("com.google.mlkit:face-detection:16.1.6")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

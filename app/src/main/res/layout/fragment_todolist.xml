@@ -4,15 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/palegreen"
-    tools:context=".Todolist">
+    android:background="@drawable/cover__23_"
+    tools:context=".AddTask.My_ToDoList_Fragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="70dp"
+        android:text=" MY TO DO LIST"
+        android:textColor="#211C70"
+        android:textSize="30dp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/addBtnHome"
-        android:layout_width="700dp"
-        android:layout_height="64dp"
+        android:layout_width="396dp"
+        android:layout_height="66dp"
         android:layout_gravity="end|top"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="130dp"
+        android:layout_marginEnd="17dp"
         android:src="@drawable/baseline_add_circle_24" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -20,10 +31,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="0dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="200dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="0dp"
-        tools:listitem="@layout/activity_each_todo_item"/>
+        tools:listitem="@layout/activity_each_todo_item" />
 
 
 </FrameLayout>

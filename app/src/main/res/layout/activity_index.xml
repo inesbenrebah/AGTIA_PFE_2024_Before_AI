@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/green"
-    tools:context=".index">
+    android:background="@drawable/cover__23_"
+    tools:context=".Splash.Splash_Activity">
 
 
     <androidx.viewpager2.widget.ViewPager2
@@ -13,8 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@drawable/view_pager_background"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/viewCenterOfNext"/>
+        app:layout_constraintBottom_toTopOf="@+id/viewCenterOfNext"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/indicatorsContainer"
         android:layout_width="wrap_content"
@@ -24,20 +25,19 @@
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
         android:text="Skip"
-        android:textColor="@color/blue"
+        android:textColor="@color/purple_200"
         android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <View
@@ -72,12 +72,12 @@
         android:id="@+id/BtnGetStarted"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:backgroundTint="@color/palegreen"
+        android:backgroundTint="@color/ic_launcher_background"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
         android:text="@string/get_started"
         android:textAllCaps="false"
-        android:textColor="#FBFAFA"
+        android:textColor="#211C70"
         android:textSize="14sp"
         android:textStyle="bold"
         app:cornerRadius="20dp"

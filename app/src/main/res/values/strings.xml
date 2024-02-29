@@ -1,13 +1,14 @@
 <resources>
     <string name="app_name">AGTIA</string>
     <string name="get_started">Get Started</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="select_date">Select Date</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">This is an app widget description</string>
     <string name="select_Priority">Select Priority</string>
+    <string name="select_rappel">select_rappel</string>
+    <string name="done_icon">done_icon</string>
     <string-array name="priority_levels">
         <item>Low</item>
         <item>Normal</item>

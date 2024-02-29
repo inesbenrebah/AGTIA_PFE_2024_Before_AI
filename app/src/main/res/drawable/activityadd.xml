@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".AddTask.AddTask_Activity">
+
+    <ImageView
+        android:id="@+id/todoClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/car_ui_icon_close"
+        tools:layout_editor_absoluteX="371dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/todoEtLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/todoDescLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@+id/todoEtLayout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/todoDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Type Description"
+            android:textColor="@color/green" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/todoEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Type your Task"
+            android:textColor="@color/green" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <ImageView
+        android:id="@+id/todoNextBtn"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="116dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/baseline_arrow_forward_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/addImageButton" />
+
+    <ImageView
+        android:id="@+id/selectDateButton"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/select_date"
+        android:src="@drawable/calendar_month_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/alarm"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/select_rappel"
+        android:src="@drawable/alarm_before_picking"
+        app:layout_constraintStart_toEndOf="@+id/selectDateButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/prioritySpinner"
+        android:layout_width="150dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="52dp"
+        android:backgroundTint="@color/palegreen"
+        android:entries="@array/priority_levels"
+        android:scrollbarSize="70dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/todoDescLayout" />
+
+    <TextView
+        android:id="@+id/selectedDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="124dp"
+        android:text="Date  "
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/selectedReminderTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="221dp" />
+
+    <TextView
+        android:id="@+id/selectedReminderTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reminder  "
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="221dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="18dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/prioritySpinner"
+        app:layout_constraintVertical_bias="0.231" />
+
+    <Button
+        android:id="@+id/addImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/green"
+        android:text="Add Image"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteY="435dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

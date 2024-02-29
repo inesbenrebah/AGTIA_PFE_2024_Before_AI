@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/cover__23_"
+    tools:context=".Friends.Add_Friends_Fragment">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="70dp"
+        android:text=" FRIENDS REQUESTS "
+        android:textColor="#211C70"
+        android:textSize="30dp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/addBtnHome"
+        android:layout_width="396dp"
+        android:layout_height="66dp"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="130dp"
+        android:layout_marginEnd="17dp"
+        android:src="@drawable/baseline_add_circle_24" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="17dp"
+            tools:listitem="@layout/activity_requests" />
+    </LinearLayout>
+
+</FrameLayout>

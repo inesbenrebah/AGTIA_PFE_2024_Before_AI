@@ -4,31 +4,76 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/green_aesthetic_wallpaper"
+    android:background="@drawable/cover__26_"
     android:orientation="vertical"
     android:padding="40dp"
-    tools:context=".RegisterPage">
+    tools:context=".Authentication.Sign_Up_Activity">
 
-    <TextView
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/photo"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="100dp"
+        android:src="@drawable/baseline_add_box_24" />
+
+
+    <Button
+        android:id="@+id/select_photo_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome"
-        android:textSize="30dp"
-        android:textStyle="bold" />
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/white"
+        android:text="Select Photo"
+        android:textColor="@color/black"
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign Up"
-        android:textSize="70dp"
-        android:textStyle="bold" />
+        android:textSize="12sp"
 
+        android:textStyle="bold" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="150dp">
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/first_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="First Name"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/last_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Last Name"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/job"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Job"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/email"
@@ -43,7 +88,7 @@
         style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+
         app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -58,7 +103,7 @@
         style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+
         app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -74,9 +119,10 @@
         android:id="@+id/signup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:backgroundTint="@color/green"
-        android:text="Log IN"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/white"
+        android:text="Sign Up"
+        android:textColor="@color/black"
         android:textSize="20dp"
         android:textStyle="bold" />
 
@@ -89,7 +135,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You  Have an Account Already ? "
+            android:layout_marginLeft="30dp"
+            android:text="       Already have an account? "
             android:textSize="15dp"
             android:textStyle="bold" />
 
@@ -100,7 +147,6 @@
             android:text="Log In  "
             android:textColor="@color/green"
             android:textSize="15dp"
-
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

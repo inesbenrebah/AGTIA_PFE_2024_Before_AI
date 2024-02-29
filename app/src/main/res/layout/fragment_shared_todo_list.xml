@@ -4,19 +4,55 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".Todolist">
+    android:background="@drawable/cover__22_"
+    tools:context=".Share_Task.Main_Share.Share_Task_Fragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/share"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="70dp"
+        android:text=" SHARE TASKS"
+        android:textColor="@color/ic_launcher_background"
+        android:textSize="30dp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/addBtnHome"
-        android:layout_width="700dp"
-        android:layout_height="64dp"
-        android:layout_gravity="end|top"
-        android:layout_marginEnd="24dp"
+        android:layout_width="80dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="300dp"
+        android:layout_marginTop="60dp"
+
         android:src="@drawable/baseline_near_me_24" />
 
+    <ImageView
+        android:id="@+id/addSharedByMe"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="185dp"
+        android:layout_marginTop="255dp"
 
+        android:src="@drawable/car_ui_icon_add" />
 
+    <ImageView
+        android:id="@+id/addSharedForMe"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="185dp"
+        android:layout_marginTop="450dp"
+
+        android:src="@drawable/car_ui_icon_add" />
+
+    <ImageView
+        android:id="@+id/addRequests"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="185dp"
+        android:layout_marginTop="625dp"
+
+        android:src="@drawable/car_ui_icon_add" />
 
 </FrameLayout>
 

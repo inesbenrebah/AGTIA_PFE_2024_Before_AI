@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="10dp"
+    app:cardUseCompatPadding="true">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+
+            <ImageView
+                android:id="@+id/todoImage"
+                android:layout_width="155dp"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_sentiment_very_dissatisfied_24"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.545"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/RequestFrom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="email"
+                    android:layout_marginTop="30dp"
+                    android:textColor="@color/green"
+                    android:textSize="25sp"
+                    android:maxLines="2"
+
+                    android:ellipsize="end"
+                    android:paddingStart="26dp"/>
+                <TextView
+                    android:id="@+id/todoTask"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Item 1"
+                    android:layout_marginTop="15dp"
+                    android:textColor="@color/green"
+                    android:textSize="25sp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingStart="26dp"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+          <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="15dp"
+       android:text="Approve"
+              android:id="@+id/approve_btn"
+       android:layout_marginTop="10dp"
+       android:textColor="@color/white"
+       android:backgroundTint="@color/pink"/>
+                     <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="Reject"
+                        android:id="@+id/reject_btn"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/white"
+                        android:backgroundTint="@color/yellow"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
