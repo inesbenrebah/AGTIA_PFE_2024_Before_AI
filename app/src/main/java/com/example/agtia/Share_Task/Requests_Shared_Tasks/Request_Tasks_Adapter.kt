@@ -4,13 +4,15 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.agtia.AddTask.Add_ToDoList_Adapter
 import com.example.agtia.databinding.SharedRequestsEachItemBinding
 import com.example.agtia.todofirst.Data.ShareData
+import com.google.firebase.database.FirebaseDatabase
 
-class Request_Tasks_Adapter(private val list: MutableList<ShareData>,private val emailTo :String):
+class Request_Tasks_Adapter(private val list: MutableList<ShareData>,private val emailTo :String,private val emailFrom:String):
   RecyclerView.Adapter<Request_Tasks_Adapter.ShareViewHolder>() {
 
     private var listener: ToDoAdapterClicksInterface? = null
@@ -18,10 +20,11 @@ class Request_Tasks_Adapter(private val list: MutableList<ShareData>,private val
     fun setListener(listener:ToDoAdapterClicksInterface) {
         this.listener = listener
     }
-    inner class ShareViewHolder( val binding: SharedRequestsEachItemBinding): RecyclerView.ViewHolder(binding.root)
+    inner class ShareViewHolder(val binding: SharedRequestsEachItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
     interface ToDoAdapterClicksInterface {
 
-        fun AcceptRequest(toDoData: ShareData,emailTo:String, position: Int, context: Context)
+        fun AcceptRequest(toDoData: ShareData,emailTo:String,emailFrom: String, position: Int, context: Context)
         fun RejectRequest(toDoData: ShareData, position: Int)
 
     }
@@ -48,8 +51,10 @@ class Request_Tasks_Adapter(private val list: MutableList<ShareData>,private val
             } else {
                 imageView.visibility = View.GONE
             }
-            approveBtn.setOnClickListener { listener?.AcceptRequest(currentItem, emailTo,position, holder.itemView.context) }
-            rejectBtn.setOnClickListener { listener?.RejectRequest(currentItem, position) }
+            approveBtn.setOnClickListener { listener?.AcceptRequest(currentItem, emailTo,emailFrom,position, holder.itemView.context) }
+            rejectBtn.setOnClickListener {
+                listener?.RejectRequest(currentItem, holder.adapterPosition)
+            }
 
     }}
 

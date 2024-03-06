@@ -35,7 +35,7 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
 
     private fun init() {
         auth = FirebaseAuth.getInstance()
-        databaseRef = FirebaseDatabase.getInstance().reference.child("RequestShared").child(auth.currentUser?.uid ?: "")
+        databaseRef = FirebaseDatabase.getInstance().reference.child("SharedByMee").child(auth.currentUser?.uid ?: "")
         binding.recycler.setHasFixedSize(true)
         binding.recycler.layoutManager = LinearLayoutManager(this)
         mList = mutableListOf()
@@ -44,7 +44,7 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
         binding.recycler.adapter = adapter
     }
     private fun encodeEmail(email: String): String {
-        return email.replace(".", ",")
+        return email.replace(".", "-")
     }
     private fun getDataFromFirebase() {
 
@@ -53,7 +53,7 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
         if (currentUserEmail != null) {
             val encodedCurrentUserEmail = encodeEmail(currentUserEmail)
         val friendListRef = FirebaseDatabase.getInstance().reference
-            .child("RequestShared")
+            .child("SharedByMee")
             .child(encodedCurrentUserEmail)
 
 
@@ -64,6 +64,7 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
                     val taskId = taskSnapshot.key ?: ""
                     val emailFrom = taskSnapshot.child("emailFrom").getValue(String::class.java) ?: ""
                     val emailTo = taskSnapshot.child("emailTo").getValue(String::class.java) ?: ""
+
                     val task = taskSnapshot.child("task").getValue(String::class.java) ?: ""
                     val desc = taskSnapshot.child("desc").getValue(String::class.java) ?: ""
                     val date = taskSnapshot.child("date").getValue(String::class.java) ?: ""

@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.agtia.Share_Task.By_Me.Adapter_Shared_By_Me
-import com.example.agtia.databinding.SharedByMeBinding
 import com.example.agtia.databinding.SharedForMeBinding
 import com.example.agtia.todofirst.Data.ShareData
 import java.text.SimpleDateFormat

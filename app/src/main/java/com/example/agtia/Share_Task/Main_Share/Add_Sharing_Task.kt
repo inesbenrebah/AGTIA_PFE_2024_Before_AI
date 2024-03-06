@@ -186,11 +186,12 @@ class Add_Sharing_Task : AppCompatActivity() {
     }
 
     fun encodeEmail(email: String): String {
-        return email.replace(".", ",")
+        return email.replace(".", "-")
     }
 
     private fun onSaveTask() {
         val currentUserEmail = auth.currentUser?.email
+        Log.d("amine ","${currentUserEmail}")
         val todoEmail = binding.todoEmail.text.toString()
         val todo = binding.todoEt.text.toString()
         val todoDesc = binding.todoDesc.text.toString()

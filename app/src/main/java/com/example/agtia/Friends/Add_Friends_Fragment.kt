@@ -180,7 +180,7 @@ class Add_Friends_Fragment : Fragment(), FriendRequestAdapter.RequestAdapterClic
 
     }
     private fun encodeEmail(email: String): String {
-        return email.replace(".", ",")
+        return email.replace(".", "-")
     }
 
     companion object {

@@ -100,6 +100,6 @@ class AddFriends_By_Email_Activity : AppCompatActivity() {
     }
 
     private fun encodeEmail(email: String): String {
-        return email.replace(".", ",")
+        return email.replace(".", "-")
     }
 }

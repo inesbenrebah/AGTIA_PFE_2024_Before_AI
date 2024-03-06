@@ -39,26 +39,30 @@ class Add_Requests_Share_Activity : AppCompatActivity(), Request_Tasks_Adapter.T
         binding.recycler.setHasFixedSize(true)
         binding.recycler.layoutManager = LinearLayoutManager(this)
         mList = mutableListOf()
-        adapter = Request_Tasks_Adapter(mList, auth.currentUser?.email ?: "")
+        adapter = Request_Tasks_Adapter(mList, auth.currentUser?.email ?: "" ,"")
         adapter.setListener(this)
         binding.recycler.adapter = adapter
     }
     private fun encodeEmail(email: String): String {
-        return email.replace(".", ",")
+        return email.replace(".", "-")
     }
 
-  override  fun AcceptRequest(toDoData: ShareData,emailTo:String, position: Int, context: Context) {
+  override  fun AcceptRequest(toDoData: ShareData,emailTo:String,emailFrom:String, position: Int, context: Context) {
         val currentUserEmail = auth.currentUser?.email
         if (currentUserEmail != null) {
             val encodedCurrentUserEmail = encodeEmail(currentUserEmail)
             val encodedFriendEmail = encodeEmail(toDoData.emailTo)
+            Log.d("thth ","${currentUserEmail}")
+            Log.d("thth ","${encodedCurrentUserEmail}")
 
-            val taskId = FirebaseDatabase.getInstance().reference.child("AcceptedTasks").push().key ?: ""
+
+            val taskId = FirebaseDatabase.getInstance().reference.child("SharedForMe").push().key ?: ""
 
 
             // Save the task data for current user
-            val currentUserTaskRef = FirebaseDatabase.getInstance().reference.child("AcceptedTasks").child(encodedCurrentUserEmail).child(taskId)
-            val friendUserTaskRef = FirebaseDatabase.getInstance().reference.child("RequestShared").child(encodedFriendEmail).child(taskId)
+            val currentUserTaskRef = FirebaseDatabase.getInstance().reference.child("SharedForMe").child(encodedCurrentUserEmail).child(taskId)
+            val friendUserTaskRef = FirebaseDatabase.getInstance().reference.child("SharedByMee").child(encodedFriendEmail).child(taskId)
+            Log.d("bb ","${currentUserTaskRef}")
 
 
             currentUserTaskRef.setValue(toDoData).addOnCompleteListener { currentUserTaskTask ->
@@ -66,6 +70,7 @@ class Add_Requests_Share_Activity : AppCompatActivity(), Request_Tasks_Adapter.T
                         // Save the task data for friend user
                         Log.d("nosnos","this is the current user ${encodedCurrentUserEmail}, and this saved as ${currentUserTaskRef}")
                         friendUserTaskRef.setValue(toDoData).addOnCompleteListener { friendUserTaskTask ->
+
                                 if (friendUserTaskTask.isSuccessful) {
                                     Log.d("nosnos","this is the friend user ${encodedFriendEmail}, and this saved as ${friendUserTaskRef}")
 
@@ -86,15 +91,9 @@ class Add_Requests_Share_Activity : AppCompatActivity(), Request_Tasks_Adapter.T
         }
     }
 
-
     override fun RejectRequest(toDoData: ShareData, position: Int) {
-        val taskId = toDoData.taskId
-        val databaseRef = FirebaseDatabase.getInstance().reference
-            .child("ShareData")
-            .child(taskId)
 
-        // Remove the task from the database
-        databaseRef.removeValue()
+        databaseRef.child(toDoData.taskId).removeValue()
             .addOnCompleteListener { removeTask ->
                 if (removeTask.isSuccessful) {
                     // Remove the task from the list and notify adapter

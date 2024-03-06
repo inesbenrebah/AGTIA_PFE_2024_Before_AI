@@ -40,7 +40,7 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
 
     private fun init() {
         auth = FirebaseAuth.getInstance()
-        databaseRef = FirebaseDatabase.getInstance().reference.child("AcceptedTasks").child(auth.currentUser?.uid ?: "")
+        databaseRef = FirebaseDatabase.getInstance().reference.child("SharedForMe").child(auth.currentUser?.uid ?: "")
         binding.recycler.setHasFixedSize(true)
         binding.recycler.layoutManager = LinearLayoutManager(this)
         mList = mutableListOf()
@@ -49,7 +49,7 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
         binding.recycler.adapter = adapter
     }
     private fun encodeEmail(email: String): String {
-        return email.replace(".", ",")
+        return email.replace(".", "-")
     }
     private fun getDataFromFirebase() {
 
@@ -58,7 +58,7 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
         if (currentUserEmail != null) {
             val encodedCurrentUserEmail = encodeEmail(currentUserEmail)
             val friendListRef = FirebaseDatabase.getInstance().reference
-                .child("AcceptedTasks")
+                .child("SharedForMe")
                 .child(encodedCurrentUserEmail)
 
 

@@ -33,7 +33,7 @@ class AdminActivity : AppCompatActivity(), MyAdapterAdmin.OnDeleteClickListener 
         setContentView(R.layout.activity_admin)
         btnExitUser = findViewById(R.id.quitte)
         recyclerView = findViewById(R.id.recyclerView)
-        searchView = findViewById(R.id.search) // Add this line to initialize the searchView
+        searchView = findViewById(R.id.search)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.setHasFixedSize(true)
 
