@@ -1,13 +1,12 @@
 package com.example.agtia.Share_Task.Requests_Shared_Tasks
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide.init
-import com.example.agtia.R
 import com.example.agtia.databinding.ActivityAddRequestsShareBinding
 import com.example.agtia.todofirst.Data.ShareData
 import com.google.firebase.auth.FirebaseAuth
@@ -16,8 +15,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.getValue
-import kotlin.math.log
+import java.util.UUID
 
 class Add_Requests_Share_Activity : AppCompatActivity(), Request_Tasks_Adapter.ToDoAdapterClicksInterface {
     private lateinit var auth: FirebaseAuth
@@ -46,63 +44,105 @@ class Add_Requests_Share_Activity : AppCompatActivity(), Request_Tasks_Adapter.T
     private fun encodeEmail(email: String): String {
         return email.replace(".", "-")
     }
-
-  override  fun AcceptRequest(toDoData: ShareData,emailTo:String,emailFrom:String, position: Int, context: Context) {
+    fun generateRandomUid(): String {
+        return UUID.randomUUID().toString()
+    }
+    override fun AcceptRequest(toDoData: ShareData, emailTo: String, emailFrom: String, position: Int, context: Context) {
         val currentUserEmail = auth.currentUser?.email
         if (currentUserEmail != null) {
             val encodedCurrentUserEmail = encodeEmail(currentUserEmail)
             val encodedFriendEmail = encodeEmail(toDoData.emailTo)
-            Log.d("thth ","${currentUserEmail}")
-            Log.d("thth ","${encodedCurrentUserEmail}")
+// the remove
+val randomUid = generateRandomUid()
+            databaseRef.child(toDoData.emailFrom).removeValue()
+                .addOnCompleteListener { removeTask ->
+                    if (removeTask.isSuccessful) {
+                        // Remove the task from the list and notify adapter
+                        mList.removeAt(position)
 
-
-            val taskId = FirebaseDatabase.getInstance().reference.child("SharedForMe").push().key ?: ""
-
-
-            // Save the task data for current user
-            val currentUserTaskRef = FirebaseDatabase.getInstance().reference.child("SharedForMe").child(encodedCurrentUserEmail).child(taskId)
-            val friendUserTaskRef = FirebaseDatabase.getInstance().reference.child("SharedByMee").child(encodedFriendEmail).child(taskId)
-            Log.d("bb ","${currentUserTaskRef}")
-
-
-            currentUserTaskRef.setValue(toDoData).addOnCompleteListener { currentUserTaskTask ->
-                    if (currentUserTaskTask.isSuccessful) {
-                        // Save the task data for friend user
-                        Log.d("nosnos","this is the current user ${encodedCurrentUserEmail}, and this saved as ${currentUserTaskRef}")
-                        friendUserTaskRef.setValue(toDoData).addOnCompleteListener { friendUserTaskTask ->
-
-                                if (friendUserTaskTask.isSuccessful) {
-                                    Log.d("nosnos","this is the friend user ${encodedFriendEmail}, and this saved as ${friendUserTaskRef}")
-
-                                    // Remove the task from the list and notify adapter
-                                    mList.removeAt(position)
-                                    adapter.notifyItemRemoved(position)
-                                    Toast.makeText(context, "Friend Accepted", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(context, "Failed to accept task for friend user", Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                        Toast.makeText(this, "removed successfully", Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(context, "Failed to accept task for current user", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Failed to remove shared task", Toast.LENGTH_SHORT).show()
                     }
+                    adapter.notifyItemRemoved(position)
                 }
+            val taskId = databaseRef.push().key ?: ""
+            Log.d("formee","email from${emailFrom}")
+            Log.d("formee","email TO${emailTo}")
+            // Save the task data for current user
+            saveDataToSharedForMe(toDoData,randomUid,taskId, encodedCurrentUserEmail, encodedFriendEmail)
+
+            // Save the task data for the friend user
+            saveDataToSharedByMe(toDoData,randomUid,taskId,encodedCurrentUserEmail, encodedFriendEmail)
+
+
+
+            Toast.makeText(context, "Friend Accepted", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Current user email is null", Toast.LENGTH_SHORT).show()
         }
     }
 
-    override fun RejectRequest(toDoData: ShareData, position: Int) {
+    private fun saveDataToSharedForMe(toDoData: ShareData,randomUUID: String,taskId:String, encodedCurrentUserEmail: String, encodedFriendEmail: String) {
+        toDoData.emailFrom = encodedFriendEmail
+        toDoData.emailTo=encodedCurrentUserEmail
+        toDoData.taskId= randomUUID.toString()
 
-        databaseRef.child(toDoData.taskId).removeValue()
+        val databaseRef = FirebaseDatabase.getInstance().reference.child("SharedForMe")
+
+        val emailFrom=toDoData.emailFrom
+        val emailTo=toDoData.emailTo
+        Log.d("forme","email from${emailFrom}")
+        Log.d("forme","email TO${emailTo}")
+        val currentUserTaskRef = databaseRef.child(encodedCurrentUserEmail).child(taskId)
+        currentUserTaskRef.setValue(toDoData).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG, "Data saved to SharedForMe for current user")
+            } else {
+                Log.e(TAG, "Failed to save data to SharedForMe for current user: ${task.exception?.message}")
+            }
+        }
+    }
+    private fun saveDataToSharedByMe(
+        toDoData: ShareData,
+        randomUUID: String,
+        taskId:String,
+        encodedCurrentUserEmail: String, encodedFriendEmail: String) {
+        // Save the emailFrom as encodedFriendEmail
+        toDoData.emailFrom = encodedFriendEmail
+        toDoData.emailTo=encodedCurrentUserEmail
+        toDoData.taskId= randomUUID.toString()
+        val databaseRef = FirebaseDatabase.getInstance().reference.child("SharedByMe")
+
+        val friendUserTaskRef = databaseRef.child(encodedFriendEmail).child(taskId)
+
+        val emailTo = toDoData.emailTo
+        Log.d("forme", "email  xxxx from $encodedFriendEmail")
+        Log.d("forme", "email TO $emailTo")
+        friendUserTaskRef.setValue(toDoData).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("forme", "Data saved to SharedByMe for friend user")
+            } else {
+                Log.e(TAG, "Failed to save data to SharedByMe for friend user: ${task.exception?.message}")
+            }
+        }
+    }
+
+
+
+    override fun RejectRequest(toDoData: ShareData, position: Int) {
+         Log.d("removee nosnos","removveeddd")
+   databaseRef.child(toDoData.emailFrom).removeValue()
             .addOnCompleteListener { removeTask ->
                 if (removeTask.isSuccessful) {
                     // Remove the task from the list and notify adapter
-                    mList.removeAt(position)
-                    adapter.notifyItemRemoved(position)
+                  mList.removeAt(position)
+
                     Toast.makeText(this, "You Rejected The Shared task", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "Failed to remove shared task", Toast.LENGTH_SHORT).show()
                 }
+                adapter.notifyItemRemoved(position)
             }
     }
 

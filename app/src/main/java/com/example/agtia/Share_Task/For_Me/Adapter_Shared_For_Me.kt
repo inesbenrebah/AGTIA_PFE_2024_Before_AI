@@ -1,13 +1,17 @@
 package com.example.agtia.Share_Task.For_Me
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.agtia.R
 import com.example.agtia.databinding.SharedForMeBinding
+import com.example.agtia.todofirst.Data.Priority
 import com.example.agtia.todofirst.Data.ShareData
+import com.example.agtia.todofirst.Data.ToDoData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -55,6 +59,22 @@ class Adapter_Shared_For_Me (private val list: MutableList<ShareData>, private v
             }
 
 
+            done.setImageResource(
+                when (currentItem.priority) {
+                    Priority.HIGH -> R.drawable.icon_priority
+                    Priority.NORMAL -> R.drawable.orange
+                    Priority.LOW -> R.drawable.baseline_blur_circular_24
+                }
+            )
+
+
+            done.setOnClickListener {
+
+                listener?.onDissatisfiedIconClicked(currentItem, holder.adapterPosition)
+                done.setImageResource(R.drawable.icon_finish)
+            }
+
+
             root.setOnClickListener {
                 listener?.onItemClicked(currentItem, holder.adapterPosition)
             }
@@ -71,6 +91,7 @@ class Adapter_Shared_For_Me (private val list: MutableList<ShareData>, private v
 
     interface ToDoAdapterClicksInterface {
         fun onDeleteItemClicked(toDoData: ShareData, position: Int)
+        fun onDissatisfiedIconClicked(toDoData: ShareData, position: Int)
         fun onEditItemClicked(toDoData: ShareData, position: Int, context: Context)
         fun onItemClicked(toDoData: ShareData, position: Int)
     }

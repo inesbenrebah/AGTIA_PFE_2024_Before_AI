@@ -6,82 +6,114 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.agtia.databinding.HorizBinding
 import com.example.agtia.databinding.SharedByMeBinding
+import com.example.agtia.todofirst.Data.GotFinished
 import com.example.agtia.todofirst.Data.ShareData
 import java.text.SimpleDateFormat
 import java.util.*
+class Adapter_Shared_By_Me(
+    private val mList: MutableList<ShareData>,
+    private val bList: MutableList<GotFinished>
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-class Adapter_Shared_By_Me(private val list: MutableList<ShareData>,private val emailFrom :String):
-  RecyclerView.Adapter<Adapter_Shared_By_Me.ShareViewHolder>() {
+    private var listener: ToDoAdapterClicksInterface? = null
 
-   private var listener: ToDoAdapterClicksInterface? = null
+    fun setListener(listener: ToDoAdapterClicksInterface) {
+        this.listener = listener
+    }
 
-   fun setListener(listener: ToDoAdapterClicksInterface) {
-       this.listener = listener
-   }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            VIEW_TYPE_VERTICAL -> {
+                val binding = SharedByMeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                VerticalViewHolder(binding)
+            }
+            VIEW_TYPE_HORIZONTAL -> {
+                val binding = HorizBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                HorizontalViewHolder(binding)
+            }
+            else -> throw IllegalArgumentException("Invalid view type")
+        }
+    }
 
-   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShareViewHolder {
-       val binding = SharedByMeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-       return ShareViewHolder(binding)
-   }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder.itemViewType == VIEW_TYPE_VERTICAL) {
+            (holder as VerticalViewHolder).bind(mList[position])
+        } else {
+            (holder as HorizontalViewHolder).bind(bList[position - mList.size])
+        }
+    }
 
-   override fun onBindViewHolder(holder: ShareViewHolder, position: Int) {
-       val currentItem = list[position]
+    override fun getItemCount(): Int {
+        return mList.size + bList.size
+    }
 
-       holder.binding.apply {
-           emailTo.text = currentItem.emailTo
-           todoTask.text = currentItem.task
-           todoDesc.text = currentItem.desc
-           todoDate.text = "Date: ${currentItem.date}"
+    override fun getItemViewType(position: Int): Int {
+        return if (position < mList.size) {
+            VIEW_TYPE_VERTICAL
+        } else {
+            VIEW_TYPE_HORIZONTAL
+        }
+    }
 
-           val imageView = todoImage
-           if (!currentItem.imageUri.isNullOrEmpty()) {
-               Glide.with(root.context)
-                   .load(currentItem.imageUri)
-                   .into(imageView)
-               imageView.visibility = View.VISIBLE
-           } else {
-               imageView.visibility = View.GONE
-           }
-           if (currentItem.reminderTime > 0) {
-               val reminderTimeFormatted = SimpleDateFormat("HH:mm", Locale.getDefault()).format(
-                   Date(currentItem.reminderTime)
-               )
-               todoalarm.text = "  Time: $reminderTimeFormatted"
-               todoalarm.visibility = View.VISIBLE
-           } else {
-               todoalarm.visibility = View.GONE
-           }
-           editTask.setOnClickListener {
-               listener?.onEditItemClicked(currentItem, position, holder.itemView.context)
-           }
-           deleteTask.setOnClickListener {
-               listener?.onDeleteItemClicked(currentItem, holder.adapterPosition)
-           }
+    inner class VerticalViewHolder(private val binding: SharedByMeBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: ShareData) {
+            binding.apply {
+                emailFrom.text = item.taskId
+                todoTask.text = item.task
+                todoDesc.text = item.desc
+                todoDate.text = "Date: ${item.date}"
 
-           root.setOnClickListener {
-               listener?.onItemClicked(currentItem, holder.adapterPosition)
-           }
-       }
-   }
+                val imageView = todoImage
+                if (!item.imageUri.isNullOrEmpty()) {
+                    Glide.with(root.context)
+                        .load(item.imageUri)
+                        .into(imageView)
+                    imageView.visibility = View.VISIBLE
+                } else {
+                    imageView.visibility = View.GONE
+                }
+                if (item.reminderTime > 0) {
+                    val reminderTimeFormatted = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(item.reminderTime))
+                    todoalarm.text = "  Time: $reminderTimeFormatted"
+                    todoalarm.visibility = View.VISIBLE
+                } else {
+                    todoalarm.visibility = View.GONE
+                }
+                deleteTask.setOnClickListener {
+                    listener?.onDeleteItemClicked(item, adapterPosition)
+                }
 
-   override fun getItemCount(): Int {
-       return list.size
-   }
+                root.setOnClickListener {
+                    listener?.onItemClicked(item, adapterPosition)
+                }
+            }
+        }
+    }
 
-   inner class ShareViewHolder( val binding: SharedByMeBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class HorizontalViewHolder(private val binding: HorizBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: GotFinished) {
+            binding.apply {
+                emailFrom.text = item.emailTo
+                todoTask.text = item.task
+                todoDate.text = item.date
 
+            root.setOnClickListener {
+                listener?.onItemClicked2(item, adapterPosition)
+            }}
+        }
+    }
 
+    interface ToDoAdapterClicksInterface {
+        fun onDeleteItemClicked(toDoData: ShareData, position: Int)
+        fun onItemClicked(toDoData: ShareData, position: Int)
+        fun onItemClicked2(toDoData: GotFinished, position: Int)
 
-   interface ToDoAdapterClicksInterface {
-       fun onDeleteItemClicked(toDoData: ShareData, position: Int)
-       fun onEditItemClicked(toDoData: ShareData, position: Int, context: Context)
-       fun onItemClicked(toDoData: ShareData, position: Int)
-   }
+    }
 
-   fun updateList(updatedList: List<ShareData>) {
-       list.clear()
-       list.addAll(updatedList)
-       notifyDataSetChanged()
-   }
+    companion object {
+        private const val VIEW_TYPE_VERTICAL = 0
+        private const val VIEW_TYPE_HORIZONTAL = 1
+    }
 }

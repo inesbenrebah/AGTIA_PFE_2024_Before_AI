@@ -46,6 +46,7 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:1.3.0")
     implementation ("androidx.fragment:fragment-ktx:1.3.0")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation("com.google.firebase:firebase-functions-ktx:20.4.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
     implementation("androidx.constraintlayout:constraintlayout")
     implementation ("org.jetbrains.kotlin:kotlin-stdlib:1.4.31")

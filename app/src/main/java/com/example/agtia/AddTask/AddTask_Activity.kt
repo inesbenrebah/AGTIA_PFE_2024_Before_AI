@@ -1,5 +1,4 @@
 package com.example.agtia.AddTask
-
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
@@ -17,6 +16,7 @@ import com.example.agtia.R
 import com.example.agtia.databinding.ActivityAddBinding
 import com.example.agtia.todofirst.Data.Priority
 import com.example.agtia.todofirst.Data.ToDoData
+import com.example.agtia.AddTask.ReminderBroadcastReceiver
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -57,8 +57,6 @@ class AddTask_Activity : AppCompatActivity() {
         val reminderTime=intent.getStringExtra("reminderTime")
         val isEditMode = intent.getBooleanExtra("isEditMode", false)
 
-        val scheduler = AndroidAlarmScheduler(this)
-        var alarmItem: AlarmItem? = null
         prioritySpinner = findViewById(R.id.prioritySpinner)
         val priorityLevels = arrayOf("Low", "Normal", "High")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, priorityLevels)
@@ -107,7 +105,7 @@ class AddTask_Activity : AppCompatActivity() {
             onSaveTask()
         }
         binding.alarm.setOnClickListener {
-              showTimePicker()
+            showTimePicker()
             binding.alarm.setImageResource(R.drawable.baseline_alarm_on_24)
         }
     }
@@ -133,24 +131,26 @@ class AddTask_Activity : AppCompatActivity() {
     }
 
 
-    private fun scheduleReminder(reminderTimeInMillis: Long, taskTitle: String) {
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, ReminderBroadcastReceiver::class.java)
-        intent.putExtra("taskTitle", taskTitle)
+    private fun scheduleNotification(reminderTimeInMillis: Long, taskTitle: String) {
+        if (reminderTimeInMillis > 0) {
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+            val intent = Intent(this, ReminderBroadcastReceiver::class.java)
+            intent.putExtra("notificationId", 101) // Change the notification ID as per your requirement
+            intent.putExtra("title", "Your notification title") // Set your notification title here
+            intent.putExtra("message", "Your notification message") // Set your notification message here
 
-        val requestCode = Random().nextInt() // Use a single requestCode for simplicity
+            val pendingIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
 
-        // Create a PendingIntent with the intent and requestCode
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-
-
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimeInMillis, pendingIntent)
+        }
     }
+
+
     private fun showTimePicker() {
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -213,8 +213,8 @@ class AddTask_Activity : AppCompatActivity() {
                 updateTaskInDatabase(newTaskData)
                 // Schedule reminder if a reminder time is set
                 if (reminderTime > 0) {
-                    val scheduler = AndroidAlarmScheduler(this)
-                    scheduler.schedule(AlarmItem(reminderTime, todo))            }
+                    scheduleNotification(reminderTime, todo)
+                }
             } else {
                 // Save new task
                 saveTaskToDatabase(newTaskData, taskId)

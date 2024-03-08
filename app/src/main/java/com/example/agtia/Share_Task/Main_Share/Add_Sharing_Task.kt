@@ -191,6 +191,7 @@ class Add_Sharing_Task : AppCompatActivity() {
 
     private fun onSaveTask() {
         val currentUserEmail = auth.currentUser?.email
+        val user2uid=auth.currentUser?.uid.toString()
         Log.d("amine ","${currentUserEmail}")
         val todoEmail = binding.todoEmail.text.toString()
         val todo = binding.todoEt.text.toString()
@@ -217,9 +218,12 @@ class Add_Sharing_Task : AppCompatActivity() {
                     val friendExists = friendCheckTask.result?.value != null
                     if (friendExists) {
                         // todoEmail is in the current user's friend list
+                        Log.d("ekhermara","From  :${encodeEmail(currentUserEmail)}")
+                        Log.d("ekhermara","To  :${todoEmail}")
                         val newTaskData = ShareData(
                             task = todo,
-                            emailFrom = currentUserEmail,
+                            emailFrom = encodeEmail(currentUserEmail),
+                            user2uid=user2uid,
                             emailTo = todoEmail,
                             desc = todoDesc,
                             date = date,
@@ -239,7 +243,7 @@ class Add_Sharing_Task : AppCompatActivity() {
                             updateTaskInDatabase(newTaskData) // Update the task directly
                         } else {
                             // Save new task
-                            saveTaskToDatabase(newTaskData, taskId)
+                            saveNewTaskToDatabase(newTaskData)
                         }
                     } else {
                         // todoEmail is not in the current user's friend list
@@ -254,12 +258,11 @@ class Add_Sharing_Task : AppCompatActivity() {
         }
     }
 
-    private fun saveTaskToDatabase(taskData: ShareData, taskId: String?) {
+    private fun saveNewTaskToDatabase(taskData: ShareData) {
         val databaseRef = FirebaseDatabase.getInstance().reference
             .child("ShareData")
         val currentUser = FirebaseAuth.getInstance().currentUser
         val usersCollection = FirebaseFirestore.getInstance().collection("users")
-
 
         // Save user image to Firebase Storage and retrieve profile photo URL from Firestore
         currentUser?.uid?.let { uid ->
@@ -273,74 +276,21 @@ class Add_Sharing_Task : AppCompatActivity() {
                     taskData.userPhotoUrl = photoUrl
 
                     // Save task data to the Firebase Realtime Database
-                    val taskId = intent.getStringExtra("taskId")
-                 //   saveTaskToDatabase(taskData, taskId)
-                }
+                    val newTaskRef = databaseRef.push()
+                    val newTaskId = newTaskRef.key ?: ""
+                    taskData.taskId = newTaskId
 
+                    val taskMap = taskData.toMap()
 
-
-
-
-        if (taskId == null) {
-            // Save new task
-            val newTaskRef = databaseRef.push()
-            val newTaskId = newTaskRef.key ?: ""
-            taskData.taskId = newTaskId
-
-            val taskMap = taskData.toMap()
-
-            newTaskRef.setValue(taskMap).addOnCompleteListener { databaseTask ->
-                if (databaseTask.isSuccessful) {
-                    Toast.makeText(this, "Task added successfully", Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    Toast.makeText(this, "Failed to AddTask_Activity task: ${databaseTask.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        } else {
-            // Update existing task
-            val taskRef = databaseRef.child(taskId)
-            val taskMap = taskData.toMap()
-
-            taskRef.updateChildren(taskMap).addOnCompleteListener { databaseTask ->
-                if (databaseTask.isSuccessful) {
-                    Toast.makeText(this, "Task updated successfully", Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    Toast.makeText(this, "Failed to update task: ${databaseTask.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }}
-
-
-        // Save image to Firebase Storage
-        val imageUri = getImageUri()
-        imageUri?.let { uri ->
-            val storageRef = FirebaseStorage.getInstance().reference
-            val imagesRef = storageRef.child("images/${UUID.randomUUID()}.jpg")
-            val uploadTask = imagesRef.putFile(uri)
-            uploadTask.continueWithTask { task ->
-                if (!task.isSuccessful) {
-                    task.exception?.let {
-                        throw it
+                    newTaskRef.setValue(taskMap).addOnCompleteListener { databaseTask ->
+                        if (databaseTask.isSuccessful) {
+                            Toast.makeText(this, "Task added successfully", Toast.LENGTH_SHORT).show()
+                            finish()
+                        } else {
+                            Toast.makeText(this, "Failed to AddTask_Activity task: ${databaseTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
-                imagesRef.downloadUrl
-            }.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val imageUrl = task.result.toString()
-                    taskData.imageUri = imageUrl
-
-                    // Update task with image URI
-                    if (taskId != null) {
-                        val taskImageRef = databaseRef.child(taskId).child("imageUri")
-                        taskImageRef.setValue(imageUrl)
-                    }
-                } else {
-                    Toast.makeText(this, "Failed to upload image: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
             }
         }
     }

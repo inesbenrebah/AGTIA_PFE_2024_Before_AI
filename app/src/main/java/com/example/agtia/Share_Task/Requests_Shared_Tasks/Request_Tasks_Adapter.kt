@@ -1,6 +1,7 @@
 package com.example.agtia.Share_Task.Requests_Shared_Tasks
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,11 +52,12 @@ class Request_Tasks_Adapter(private val list: MutableList<ShareData>,private val
             } else {
                 imageView.visibility = View.GONE
             }
-            approveBtn.setOnClickListener { listener?.AcceptRequest(currentItem, emailTo,emailFrom,position, holder.itemView.context) }
+            approveBtn.setOnClickListener {
+                listener?.AcceptRequest(currentItem, emailTo,emailFrom,position, holder.itemView.context) }
             rejectBtn.setOnClickListener {
                 listener?.RejectRequest(currentItem, holder.adapterPosition)
             }
-
+            Log.d("ShareAdapter", "EmailFrom: ${currentItem.emailFrom}, EmailTo: ${currentItem.emailTo}")
     }}
 
 

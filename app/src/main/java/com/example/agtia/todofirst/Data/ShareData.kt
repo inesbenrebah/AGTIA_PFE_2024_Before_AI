@@ -12,7 +12,7 @@ data class ShareData(
     var desc: String = "",
     var date: String = "",
     var userPhotoUrl: String? = null,
-
+   var user2uid: String="",
     var imageUri: String? = null,
     var done: Boolean = false,
     var priority: Priority = Priority.NORMAL,
@@ -30,6 +30,7 @@ data class ShareData(
             "desc" to desc,
             "date" to date,
             "userPhotoUrl" to userPhotoUrl,
+            "user2uid" to user2uid,
             "imageUri" to imageUri,
             "done" to done,
             "priority" to priority.name, // Store priority as string in the database
