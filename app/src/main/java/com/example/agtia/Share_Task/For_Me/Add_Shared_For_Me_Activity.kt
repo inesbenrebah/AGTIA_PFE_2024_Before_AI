@@ -14,8 +14,10 @@ import com.example.agtia.Share_Task.By_Me.Adapter_Shared_By_Me
 import com.example.agtia.Share_Task.Main_Share.Add_Sharing_Task
 import com.example.agtia.databinding.ActivityAddSharedByMeBinding
 import com.example.agtia.databinding.ActivityAddSharedForMeBinding
+import com.example.agtia.todofirst.Data.GotDeleted
 import com.example.agtia.todofirst.Data.GotFinished
 import com.example.agtia.todofirst.Data.History
+import com.example.agtia.todofirst.Data.Priority
 import com.example.agtia.todofirst.Data.ShareData
 import com.example.agtia.todofirst.Data.ToDoData
 import com.google.firebase.auth.FirebaseAuth
@@ -39,7 +41,9 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
     private lateinit var functions: FirebaseFunctions
     private lateinit var binding: ActivityAddSharedForMeBinding
     private lateinit var adapter: Adapter_Shared_For_Me
+    private lateinit var adapter2: Adapter_Shared_For_Me
     private lateinit var mList: MutableList<ShareData>
+    private lateinit var bList: MutableList<GotDeleted>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,30 +54,38 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
         functions = FirebaseFunctions.getInstance()
 
         getDataFromFirebase()
+        getDataFromFirebase2()
     }
 
     private fun init() {
         auth = FirebaseAuth.getInstance()
         databaseRef = FirebaseDatabase.getInstance().reference.child("SharedForMe").child(auth.currentUser?.uid ?: "")
         binding.recycler.setHasFixedSize(true)
+        databaseRef1 = FirebaseDatabase.getInstance().reference.child("History")
 
         databaseReff = FirebaseDatabase.getInstance().reference.child("SharedForMe")
         databaseRefff = FirebaseDatabase.getInstance().reference.child("SharedByMe")
         databaseReference=FirebaseDatabase.getInstance().reference
 
-        databaseRef1 = FirebaseDatabase.getInstance().reference
-            .child("History").child(auth.currentUser?.uid.toString())
-
+        binding.recycler.setHasFixedSize(true)
         binding.recycler.layoutManager = LinearLayoutManager(this)
-
         mList = mutableListOf()
-        adapter = Adapter_Shared_For_Me(mList,auth.currentUser?.email ?: "")
+        adapter = Adapter_Shared_For_Me(mList, mutableListOf())
         adapter.setListener(this)
         binding.recycler.adapter = adapter
+
+        binding.recycler2.setHasFixedSize(true)
+        binding.recycler2.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        bList = mutableListOf()
+        adapter2 = Adapter_Shared_For_Me(mutableListOf(), bList)
+        adapter2.setListener(this)
+        binding.recycler2.adapter = adapter2
 
     }
     private fun encodeEmail(email: String): String {
         return email.replace(".", "-")
+    }  private fun decodeEmail(email: String): String {
+        return email.replace("-", ".")
     }
     private fun getDataFromFirebase() {
 
@@ -105,6 +117,8 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
                         val reminderTimeInMillis =
                             taskSnapshot.child("reminderTime").getValue(Long::class.java) ?: -1L
                         val formattedReminderTime = formatReminderTime(reminderTimeInMillis)
+                        val priority = Priority.valueOf(taskSnapshot.child("priority").getValue(String::class.java) ?: Priority.NORMAL.name)
+
                         if (encodeEmail(emailTo) == encodedCurrentUserEmail) {
                             val shareData = ShareData(
                                 taskId,
@@ -115,21 +129,70 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
                                 date,
                                 imageUri = imageUri,
                                 reminderTime = reminderTimeInMillis,
-                                formattedReminderTime = formattedReminderTime
+                                formattedReminderTime = formattedReminderTime,
+                                priority = priority
                             )
                             mList.add(shareData)
                         }
                     }
-                    adapter.notifyDataSetChanged()
-                }
+                    sortAndDisplayTasksByPriority()
+
+                    adapter.notifyDataSetChanged()}
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@Add_Shared_For_Me_Activity, error.message, Toast.LENGTH_SHORT).show()
+                    }
+                })}
+        }
+    private fun sortAndDisplayTasksByPriority() {
+        adapter.updateList(mList.sortedByDescending { it.priority })
+    }
+                private fun getDataFromFirebase2() {
+
+
+                    val currentUserEmail = auth.currentUser?.email
+                    if (currentUserEmail != null) {
+                        val encodedCurrentUserEmail = encodeEmail(currentUserEmail)
+                        val friendListRef = FirebaseDatabase.getInstance().reference
+                            .child("GotDeleted").child(encodedCurrentUserEmail)
+
+                        friendListRef.addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                bList.clear()
+                                for (taskSnapshot in snapshot.children) {
+                                    val taskId = taskSnapshot.key ?: ""
+                                    val emailFrom = taskSnapshot.child("emailFrom").getValue(String::class.java) ?: ""
+                                    val emailTo = taskSnapshot.child("emailTo").getValue(String::class.java) ?: ""
+                                    Log.d("test","email from${emailFrom}")
+                                    Log.d("test","email TO${ auth.currentUser?.email}")
+                                    val task = taskSnapshot.child("task").getValue(String::class.java) ?: ""
+                                    val date = taskSnapshot.child("date").getValue(String::class.java) ?: ""
+                                    val enco=encodeEmail(emailTo)
+                                    Log.d("test","eenco ${enco}")
+                                    Log.d("test","eenco ${encodedCurrentUserEmail}")
+
+                                    if (enco ==encodedCurrentUserEmail) {
+                                        val shareData = GotDeleted(
+                                            taskId,
+                                            emailFrom,
+                                            emailTo,
+                                            task,
+                                            date
+                                        )
+                                        bList.add(shareData)}}
+
+                                adapter.notifyDataSetChanged()
+
+                            }
+
+
 
 
 
                 override fun onCancelled(error: DatabaseError) {
                     Toast.makeText(this@Add_Shared_For_Me_Activity, error.message, Toast.LENGTH_SHORT).show()
                 }
-            })}
-    }
+            })}}
+
     private fun formatReminderTime(reminderTimeInMillis: Long): String {
         if (reminderTimeInMillis == -1L) return ""
         val hours = (reminderTimeInMillis % (60 * 60 * 1000))
@@ -137,15 +200,7 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
         return String.format("%02d:%02d", hours, minutes)
     }
 
-    override fun onDeleteItemClicked(shareData : ShareData, position: Int) {
-        databaseRef.child(shareData.taskId).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) {
-                Toast.makeText(this@Add_Shared_For_Me_Activity, "Deleted Successfully", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@Add_Shared_For_Me_Activity, it.exception?.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+
 
     override fun onDissatisfiedIconClicked(toDoData: ShareData, position: Int) {
         // Change the icon immediately
@@ -172,10 +227,16 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
         }, 2000) // Delay of 2 seconds
     }
 
-
-    private fun decodeEmail(email: String): String {
-        return email.replace("-", ".")
+    override fun onDeleteItemClicked(shareData : ShareData, position: Int) {
+        databaseRef.child(shareData.taskId).removeValue().addOnCompleteListener {
+            if (it.isSuccessful) {
+                Toast.makeText(this@Add_Shared_For_Me_Activity, "Deleted Successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@Add_Shared_For_Me_Activity, it.exception?.message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
+
     private fun deleteTaskFromFirebase(shareData : ShareData, position: Int) {
 
 
@@ -187,26 +248,26 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
         Log.d("his nosnos","inti ${currentuser} w hedha coded ${encodedCurrentUserEmail}")
         Log.d("his nosnos","w hedhi el id taa task${shareData.emailFrom}")
         if (encodedCurrentUserEmail != null) {
-        databaseReff.child(encodedCurrentUserEmail).child(shareData.emailFrom).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) {
-                Toast.makeText(this, "Task Completed successfully", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, it.exception?.message, Toast.LENGTH_SHORT).show()
-            }}
+            databaseReff.child(encodedCurrentUserEmail).child(shareData.emailFrom).removeValue().addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Toast.makeText(this, "Task Completed successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, it.exception?.message, Toast.LENGTH_SHORT).show()
+                }}
 
-        databaseRefff.child(shareData.emailTo).child(shareData.emailFrom).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) {
-                Log.d("his nosnos","theb tnahi mn and ${tr} el task ${shareData.emailFrom}")
+            databaseRefff.child(shareData.emailTo).child(shareData.emailFrom).removeValue().addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.d("his nosnos","theb tnahi mn and ${tr} el task ${shareData.emailFrom}")
 
 
-                val decode = shareData.emailTo?.let { decodeEmail(it) }
-                decode?.let { decodedEmail ->
-                    sendEmail(decodedEmail, currentuser.toString())
+                    val decode = shareData.emailTo?.let { decodeEmail(it) }
+                    decode?.let { decodedEmail ->
+                        sendEmail(decodedEmail, currentuser.toString())
+                    }
+                    Toast.makeText(this@Add_Shared_For_Me_Activity, "Deleted Successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@Add_Shared_For_Me_Activity ,it.exception?.message, Toast.LENGTH_SHORT).show()
                 }
-                Toast.makeText(this@Add_Shared_For_Me_Activity, "Deleted Successfully", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@Add_Shared_For_Me_Activity ,it.exception?.message, Toast.LENGTH_SHORT).show()
-            }
             }
 
         }
@@ -239,7 +300,7 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
         val encodedCurrentUserEmail = currentuser?.let { encodeEmail(it) }
         val newFinish=GotFinished(
             emailFrom = encodedCurrentUserEmail.toString(),
-            emailTo = toDoData.taskId,
+            emailTo = taskId,
             taskId = toDoData.emailFrom,
             task=toDoData.task,
             date=formattedDate
@@ -296,6 +357,10 @@ class Add_Shared_For_Me_Activity  : AppCompatActivity(), Adapter_Shared_For_Me.T
 
     override fun onItemClicked(toDoData: ShareData, position: Int) {
         Toast.makeText(this@Add_Shared_For_Me_Activity, "this is sent to ${toDoData.emailTo}", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onItemClicked2(gotDeleted: GotDeleted, position: Int) {
+        Toast.makeText(this@Add_Shared_For_Me_Activity, "it got Deleted", Toast.LENGTH_SHORT).show()
     }
 
 }

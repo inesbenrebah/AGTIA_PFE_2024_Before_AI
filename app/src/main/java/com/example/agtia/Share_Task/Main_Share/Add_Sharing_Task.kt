@@ -15,9 +15,6 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
-import com.example.agtia.AddTask.AlarmItem
-import com.example.agtia.AddTask.AndroidAlarmScheduler
-import com.example.agtia.AddTask.ReminderBroadcastReceiver
 import com.example.agtia.R
 import com.example.agtia.databinding.ActivityAddSharingTaskBinding
 import com.example.agtia.todofirst.Data.Priority
@@ -25,11 +22,9 @@ import com.example.agtia.todofirst.Data.ShareData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import java.util.Calendar
 import java.util.Locale
 import java.util.Random
-import java.util.UUID
 
 class Add_Sharing_Task : AppCompatActivity() {
 
@@ -67,8 +62,7 @@ class Add_Sharing_Task : AppCompatActivity() {
         val reminderTime = intent.getStringExtra("reminderTime")
         val isEditMode = intent.getBooleanExtra("isEditMode", false)
 
-        val scheduler = AndroidAlarmScheduler(this)
-        var alarmItem: AlarmItem? = null
+
         prioritySpinner = findViewById(R.id.prioritySpinner)
         val priorityLevels = arrayOf("Low", "Normal", "High")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, priorityLevels)
@@ -140,22 +134,7 @@ class Add_Sharing_Task : AppCompatActivity() {
         datePicker.show()
     }
 
-    private fun scheduleReminder(reminderTimeInMillis: Long, taskTitle: String) {
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, ReminderBroadcastReceiver::class.java)
-        intent.putExtra("taskTitle", taskTitle)
 
-        val requestCode = Random().nextInt() // Use a single requestCode for simplicity
-
-        // Create a PendingIntent with the intent and requestCode
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-    }
 
     private fun showTimePicker() {
         val calendar = Calendar.getInstance()
@@ -217,6 +196,7 @@ class Add_Sharing_Task : AppCompatActivity() {
                 if (friendCheckTask.isSuccessful) {
                     val friendExists = friendCheckTask.result?.value != null
                     if (friendExists) {
+                        Log.d("ekhermara","hedhi prioerity ${priority}")
                         // todoEmail is in the current user's friend list
                         Log.d("ekhermara","From  :${encodeEmail(currentUserEmail)}")
                         Log.d("ekhermara","To  :${todoEmail}")
@@ -236,10 +216,7 @@ class Add_Sharing_Task : AppCompatActivity() {
                             // Update existing task
                             newTaskData.taskId = taskId
                             // Schedule reminder if a reminder time is set
-                            if (reminderTime > 0) {
-                                val scheduler = AndroidAlarmScheduler(this)
-                                scheduler.schedule(AlarmItem(reminderTime, todo))
-                            }
+
                             updateTaskInDatabase(newTaskData) // Update the task directly
                         } else {
                             // Save new task

@@ -85,16 +85,10 @@ class Profile_Fragment : Fragment() {
         }
 
         deleteAccountButton.setOnClickListener {
-            currentUser?.delete()?.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val intent = Intent(requireContext(), Log_In_Activity::class.java)
-                    startActivity(intent)
-                    requireActivity().finish()
-                } else {
-                    Toast.makeText(requireContext(), "Failed to delete account: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
+            val intent = Intent(requireActivity(), Confirmation_Activity::class.java)
+            startActivity(intent)
         }
+
 
 
 

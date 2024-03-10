@@ -1,7 +1,7 @@
 package com.example.agtia.todofirst.Data
 
 enum class job {
-    Developper,
+    Developer,
     Designer,
     Tester
 }

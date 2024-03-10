@@ -1,10 +1,16 @@
 package com.example.agtia.AddTask
+import android.Manifest
 import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,7 +22,8 @@ import com.example.agtia.R
 import com.example.agtia.databinding.ActivityAddBinding
 import com.example.agtia.todofirst.Data.Priority
 import com.example.agtia.todofirst.Data.ToDoData
-import com.example.agtia.AddTask.ReminderBroadcastReceiver
+
+import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -24,7 +31,10 @@ import java.util.*
 
 class AddTask_Activity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
-
+    private lateinit var picker: MaterialTimePicker
+    private lateinit var calendar: Calendar
+    private lateinit var pendingIntent: PendingIntent
+    private lateinit var alarmManager: AlarmManager
     private lateinit var binding: ActivityAddBinding
     private lateinit var prioritySpinner: Spinner
     private var selectedReminderTimeInMillis: Long = -1
@@ -36,7 +46,10 @@ class AddTask_Activity : AppCompatActivity() {
                 binding.imageView.visibility = View.VISIBLE
             }
         }
-
+    companion object {
+        const val channelId = "alarm_channel"
+        const val PERMISSION_REQUEST_CODE = 1001
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddBinding.inflate(layoutInflater)
@@ -87,6 +100,7 @@ class AddTask_Activity : AppCompatActivity() {
 
 
 
+
     private fun setupViews() {
         binding.todoClose.setOnClickListener {
             finish()
@@ -103,12 +117,58 @@ class AddTask_Activity : AppCompatActivity() {
 
         binding.todoNextBtn.setOnClickListener {
             onSaveTask()
+
         }
         binding.alarm.setOnClickListener {
+            createNotificationChannel(this, channelId)
             showTimePicker()
+
             binding.alarm.setImageResource(R.drawable.baseline_alarm_on_24)
         }
+        binding.setthealarm.setOnClickListener {
+            setAlarm()
+        }
+
+        checkPermissions()
     }
+    private fun checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACCESS_NOTIFICATION_POLICY) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(
+                    arrayOf(
+                        Manifest.permission.SET_ALARM,
+                        Manifest.permission.ACCESS_NOTIFICATION_POLICY
+                    ),
+                    PERMISSION_REQUEST_CODE
+                )
+            }
+        }
+    }
+    private fun createNotificationChannel(context: Context, channelId: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelName = "Alarm Channel"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(channelId, channelName, importance)
+
+            val notificationManager = context.getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun setAlarm() {
+        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val requestCode = System.currentTimeMillis().toInt() // Generate a unique request code
+        pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT)
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, selectedReminderTimeInMillis, pendingIntent)
+        Toast.makeText(this, "Alarm Set Successfully", Toast.LENGTH_SHORT).show()
+    }
+
+
+
+
 
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
@@ -131,24 +191,7 @@ class AddTask_Activity : AppCompatActivity() {
     }
 
 
-    private fun scheduleNotification(reminderTimeInMillis: Long, taskTitle: String) {
-        if (reminderTimeInMillis > 0) {
-            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-            val intent = Intent(this, ReminderBroadcastReceiver::class.java)
-            intent.putExtra("notificationId", 101) // Change the notification ID as per your requirement
-            intent.putExtra("title", "Your notification title") // Set your notification title here
-            intent.putExtra("message", "Your notification message") // Set your notification message here
 
-            val pendingIntent = PendingIntent.getBroadcast(
-                this,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
-
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimeInMillis, pendingIntent)
-        }
-    }
 
 
     private fun showTimePicker() {
@@ -212,9 +255,7 @@ class AddTask_Activity : AppCompatActivity() {
                 newTaskData.taskId = taskId
                 updateTaskInDatabase(newTaskData)
                 // Schedule reminder if a reminder time is set
-                if (reminderTime > 0) {
-                    scheduleNotification(reminderTime, todo)
-                }
+
             } else {
                 // Save new task
                 saveTaskToDatabase(newTaskData, taskId)
@@ -222,6 +263,8 @@ class AddTask_Activity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Please fill in both task and description", Toast.LENGTH_SHORT).show()
         }
+        setAlarm()
+
     }
     private fun updateTaskInDatabase(taskData: ToDoData) {
         val databaseRef = FirebaseDatabase.getInstance().reference

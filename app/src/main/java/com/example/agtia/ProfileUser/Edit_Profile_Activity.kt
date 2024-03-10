@@ -1,13 +1,11 @@
 package com.example.agtia.ProfileUser
-
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import com.example.agtia.R
+import com.example.agtia.todofirst.Data.job
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,11 +15,11 @@ class Edit_Profile_Activity : AppCompatActivity() {
 
     private lateinit var editTextFirstName: TextInputEditText
     private lateinit var editTextLastName: TextInputEditText
-    private lateinit var editTextJob: TextInputEditText
     private lateinit var saveButton: Button
     private lateinit var selectPhotoButton: Button
     private lateinit var profileImage: ImageView
     private var selectedPhotoUri: Uri? = null
+    private lateinit var jobSpinner: Spinner
 
     private val currentUser = FirebaseAuth.getInstance().currentUser
     private val usersCollection = FirebaseFirestore.getInstance().collection("users")
@@ -32,10 +30,15 @@ class Edit_Profile_Activity : AppCompatActivity() {
 
         editTextFirstName = findViewById(R.id.edit_text_first_name)
         editTextLastName = findViewById(R.id.edit_text_last_name)
-        editTextJob = findViewById(R.id.edit_text_job)
         saveButton = findViewById(R.id.save_changes_button)
         selectPhotoButton = findViewById(R.id.select_photo_button)
         profileImage = findViewById(R.id.profile_image)
+        jobSpinner = findViewById(R.id.jobSpinner)
+
+        val jobLevels = arrayOf("Developer", "Designer", "Tester")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, jobLevels)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        jobSpinner.adapter = adapter
 
         currentUser?.uid?.let { uid ->
             usersCollection.document(uid).get().addOnSuccessListener { documentSnapshot ->
@@ -43,7 +46,14 @@ class Edit_Profile_Activity : AppCompatActivity() {
                 if (userData != null) {
                     editTextFirstName.setText(userData["firstName"].toString())
                     editTextLastName.setText(userData["lastName"].toString())
-                    editTextJob.setText(userData["job"].toString())
+                    val job = userData["job"].toString()
+                    val jobPosition = when (job) {
+                        "Developer" -> 0
+                        "Designer" -> 1
+                        "Tester" -> 2
+                        else -> 0 // Default to Developer if job is not recognized
+                    }
+                    jobSpinner.setSelection(jobPosition)
                     // Load profile image if available
                     val photoUrl = userData["photoUrl"].toString()
                     if (photoUrl.isNotEmpty()) {
@@ -63,7 +73,7 @@ class Edit_Profile_Activity : AppCompatActivity() {
         saveButton.setOnClickListener {
             val firstName = editTextFirstName.text.toString()
             val lastName = editTextLastName.text.toString()
-            val job = editTextJob.text.toString()
+            val job = jobSpinner.selectedItem.toString()
 
             currentUser?.uid?.let { uid ->
                 val updatedData = hashMapOf(

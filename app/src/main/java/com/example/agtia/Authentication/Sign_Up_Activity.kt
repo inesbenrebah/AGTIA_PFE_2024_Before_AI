@@ -2,17 +2,23 @@ package com.example.agtia.Authentication
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.agtia.R
+import com.example.agtia.todofirst.Data.Priority
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.example.agtia.todofirst.Data.job.Tester
+import com.example.agtia.todofirst.Data.job.Developer
+import com.example.agtia.todofirst.Data.job.Designer
 
 class Sign_Up_Activity : AppCompatActivity() {
     private lateinit var editTextFirstName: TextInputEditText
@@ -22,6 +28,7 @@ class Sign_Up_Activity : AppCompatActivity() {
     private lateinit var editTextPassword: TextInputEditText
     private lateinit var editTextRePassword: TextInputEditText
     private lateinit var signin: Button
+    private lateinit var jobSpinner: Spinner
     private lateinit var signup: TextView
     private lateinit var selectPhotoButton: Button
     private lateinit var firebaseAuth: FirebaseAuth
@@ -50,7 +57,7 @@ class Sign_Up_Activity : AppCompatActivity() {
 
         editTextFirstName = findViewById(R.id.first_name)
         editTextLastName = findViewById(R.id.last_name)
-        editTextJob = findViewById(R.id.job)
+
         editTextEmail = findViewById(R.id.email)
         editTextPassword = findViewById(R.id.password)
         editTextRePassword = findViewById(R.id.repassword)
@@ -62,6 +69,12 @@ class Sign_Up_Activity : AppCompatActivity() {
             val intent = Intent(this, Log_In_Activity::class.java)
             startActivity(intent)
         }
+        jobSpinner = findViewById(R.id.jobSpinner)
+
+        val jobLevels = arrayOf("Developer", "Designer", "Tester")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, jobLevels)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        jobSpinner.adapter = adapter
 
         selectPhotoButton.setOnClickListener {
             // Open the photo selection dialog
@@ -74,9 +87,7 @@ class Sign_Up_Activity : AppCompatActivity() {
             val repassword = editTextRePassword.text.toString()
             val firstName = editTextFirstName.text.toString()
             val lastName = editTextLastName.text.toString()
-            val job = editTextJob.text.toString()
-
-            if (email.isNotEmpty() && password.isNotEmpty() && repassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty() && job.isNotEmpty() && selectedPhotoUri != null) {
+            if (email.isNotEmpty() && password.isNotEmpty() && repassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()  && selectedPhotoUri != null) {
                 if (password == repassword) {
                     firebaseAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
@@ -92,6 +103,13 @@ class Sign_Up_Activity : AppCompatActivity() {
                                         ).show()
 
                                         val intent = Intent(this, Log_In_Activity::class.java)
+
+                                        val job = when (jobSpinner.selectedItemPosition) {
+                                            0 -> Developer
+                                            1 -> Designer
+                                            2 -> Tester
+                                            else -> Developer // Default value if position is not recognized
+                                        }
 
                                         val usersCollection = FirebaseFirestore.getInstance().collection("users")
                                         val user = hashMapOf(

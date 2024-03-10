@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.agtia.databinding.ActivityAddRequestsShareBinding
+import com.example.agtia.todofirst.Data.Priority
 import com.example.agtia.todofirst.Data.ShareData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -52,37 +53,34 @@ class Add_Requests_Share_Activity : AppCompatActivity(), Request_Tasks_Adapter.T
         if (currentUserEmail != null) {
             val encodedCurrentUserEmail = encodeEmail(currentUserEmail)
             val encodedFriendEmail = encodeEmail(toDoData.emailTo)
-// the remove
-val randomUid = generateRandomUid()
+
+            // the remove
+            val randomUid = generateRandomUid()
             databaseRef.child(toDoData.emailFrom).removeValue()
                 .addOnCompleteListener { removeTask ->
                     if (removeTask.isSuccessful) {
-                        // Remove the task from the list and notify adapter
-                        mList.removeAt(position)
-
-                        Toast.makeText(this, "removed successfully", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Removed successfully", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this, "Failed to remove shared task", Toast.LENGTH_SHORT).show()
                     }
                     adapter.notifyItemRemoved(position)
                 }
+            mList.removeAt(position)
+            adapter.notifyItemRemoved(position)
+
             val taskId = databaseRef.push().key ?: ""
-            Log.d("formee","email from${emailFrom}")
-            Log.d("formee","email TO${emailTo}")
+
             // Save the task data for current user
-            saveDataToSharedForMe(toDoData,randomUid,taskId, encodedCurrentUserEmail, encodedFriendEmail)
+            saveDataToSharedForMe(toDoData, randomUid, taskId, encodedCurrentUserEmail, encodedFriendEmail)
 
             // Save the task data for the friend user
-            saveDataToSharedByMe(toDoData,randomUid,taskId,encodedCurrentUserEmail, encodedFriendEmail)
-
-
+            saveDataToSharedByMe(toDoData, randomUid, taskId, encodedCurrentUserEmail, encodedFriendEmail)
 
             Toast.makeText(context, "Friend Accepted", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Current user email is null", Toast.LENGTH_SHORT).show()
         }
     }
-
     private fun saveDataToSharedForMe(toDoData: ShareData,randomUUID: String,taskId:String, encodedCurrentUserEmail: String, encodedFriendEmail: String) {
         toDoData.emailFrom = encodedFriendEmail
         toDoData.emailTo=encodedCurrentUserEmail
@@ -129,15 +127,12 @@ val randomUid = generateRandomUid()
     }
 
 
-
     override fun RejectRequest(toDoData: ShareData, position: Int) {
-         Log.d("removee nosnos","removveeddd")
-   databaseRef.child(toDoData.emailFrom).removeValue()
+        databaseRef.child(toDoData.emailFrom).removeValue()
             .addOnCompleteListener { removeTask ->
                 if (removeTask.isSuccessful) {
                     // Remove the task from the list and notify adapter
-                  mList.removeAt(position)
-
+                    mList.removeAt(position)
                     Toast.makeText(this, "You Rejected The Shared task", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "Failed to remove shared task", Toast.LENGTH_SHORT).show()
@@ -165,6 +160,8 @@ val randomUid = generateRandomUid()
                     val userPhotoUrl = taskSnapshot.child("userPhotoUrl").getValue(String::class.java)
                     val reminderTimeInMillis = taskSnapshot.child("reminderTime").getValue(Long::class.java) ?: -1L
                     val formattedReminderTime = formatReminderTime(reminderTimeInMillis)
+                    val priority = Priority.valueOf(taskSnapshot.child("priority").getValue(String::class.java) ?: Priority.NORMAL.name)
+
                     if (emailTo == auth.currentUser?.email) {
                         val shareData = ShareData(
                             taskId,
@@ -176,7 +173,8 @@ val randomUid = generateRandomUid()
                             imageUri = imageUri,
                             userPhotoUrl = userPhotoUrl,
                             reminderTime = reminderTimeInMillis,
-                            formattedReminderTime = formattedReminderTime
+                            formattedReminderTime = formattedReminderTime,
+                            priority = priority
                         )
                         mList.add(shareData)
                     }

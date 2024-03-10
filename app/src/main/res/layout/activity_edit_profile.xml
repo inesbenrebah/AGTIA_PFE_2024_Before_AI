@@ -4,34 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/cover__23_"
     android:orientation="vertical"
-    tools:context=".ProfileUser.Edit_Profile_Activity"
->
+    tools:context=".ProfileUser.Edit_Profile_Activity">
+
     <ImageView
         android:id="@+id/todoClose"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="16dp"
         android:layout_marginLeft="360dp"
+        android:layout_marginTop="16dp"
         android:src="@drawable/car_ui_icon_close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/profile_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/car_ui_icon_add"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/car_ui_icon_add" />
+
     <Button
         android:id="@+id/select_photo_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Photo"
-        android:textColor="@android:color/white"
-        android:backgroundTint="@color/teal_700"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/teal_700"
+        android:text="Select Photo"
+        android:textColor="@android:color/white" />
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -59,28 +62,30 @@
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    <TextView
+        android:id="@+id/textView5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Job">
+        android:text="  Have You Changed  Your Job ? : "
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_text_job"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
+    <Spinner
+        android:id="@+id/jobSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="16dp" />
 
     <Button
         android:id="@+id/save_changes_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save Changes"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
-        android:backgroundTint="@color/teal_700"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="@color/teal_700"
+        android:text="Save Changes"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
 
 </LinearLayout>

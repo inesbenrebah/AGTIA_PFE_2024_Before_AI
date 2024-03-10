@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/cover__17_"
     tools:context=".Share_Task.Requests_Shared_Tasks.Add_Requests_Share_Activity">
 
 
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="60dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="73dp"
         android:text=" Request Shared Tasks"
         android:textColor="#211C70"
         android:textSize="30dp"
