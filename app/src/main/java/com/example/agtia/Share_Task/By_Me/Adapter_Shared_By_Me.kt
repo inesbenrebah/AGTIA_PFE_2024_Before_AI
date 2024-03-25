@@ -98,7 +98,14 @@ class Adapter_Shared_By_Me(
                 emailFrom.text = item.emailTo
                 todoTask.text = item.task
                 todoDate.text = item.date
+                ratingBar.rating = item.rating
+                ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
+                    // Update the rating value in the data model
+                    item.rating = rating
 
+                    // Notify the adapter about the rating change
+                    listener?.CalculateRating(item, adapterPosition)
+                }
             root.setOnClickListener {
                 listener?.onItemClicked2(item, adapterPosition)
             }}
@@ -109,6 +116,7 @@ class Adapter_Shared_By_Me(
         fun onDeleteItemClicked(toDoData: ShareData, position: Int)
         fun onItemClicked(toDoData: ShareData, position: Int)
         fun onItemClicked2(toDoData: GotFinished, position: Int)
+        fun CalculateRating(toDoData: GotFinished,position: Int)
 
     }
 

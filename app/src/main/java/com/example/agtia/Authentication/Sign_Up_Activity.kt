@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.agtia.R
+import com.example.agtia.todofirst.Data.AllEmails
+import com.example.agtia.todofirst.Data.Friend
 import com.example.agtia.todofirst.Data.Priority
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +21,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.example.agtia.todofirst.Data.job.Tester
 import com.example.agtia.todofirst.Data.job.Developer
 import com.example.agtia.todofirst.Data.job.Designer
+import com.google.firebase.database.FirebaseDatabase
 
 class Sign_Up_Activity : AppCompatActivity() {
     private lateinit var editTextFirstName: TextInputEditText
@@ -35,19 +38,20 @@ class Sign_Up_Activity : AppCompatActivity() {
 
     private var selectedPhotoUri: Uri? = null
 
-    private val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    private val getContent =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
 
 
-        uri?.let {
-            selectedPhotoUri = it
-            findViewById<ImageView>(R.id.photo).setImageURI(it)
-            selectPhotoButton.text = "Photo Selected"
-            // Remove circular shape background
-            findViewById<ImageView>(R.id.photo).background = null
+            uri?.let {
+                selectedPhotoUri = it
+                findViewById<ImageView>(R.id.photo).setImageURI(it)
+                selectPhotoButton.text = "Photo Selected"
+                // Remove circular shape background
+                findViewById<ImageView>(R.id.photo).background = null
+            }
+
+
         }
-
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,57 +91,59 @@ class Sign_Up_Activity : AppCompatActivity() {
             val repassword = editTextRePassword.text.toString()
             val firstName = editTextFirstName.text.toString()
             val lastName = editTextLastName.text.toString()
-            if (email.isNotEmpty() && password.isNotEmpty() && repassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()  && selectedPhotoUri != null) {
+            if (email.isNotEmpty() && password.isNotEmpty() && repassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty() && selectedPhotoUri != null) {
                 if (password == repassword) {
                     firebaseAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 val currentUser = FirebaseAuth.getInstance().currentUser
 
-                                currentUser?.sendEmailVerification()?.addOnCompleteListener { verificationTask ->
-                                    if (verificationTask.isSuccessful) {
-                                        Toast.makeText(
-                                            this,
-                                            "Verification email sent. Please verify your email address.",
-                                            Toast.LENGTH_LONG
-                                        ).show()
+                                currentUser?.sendEmailVerification()
+                                    ?.addOnCompleteListener { verificationTask ->
+                                        if (verificationTask.isSuccessful) {
+                                            Toast.makeText(
+                                                this,
+                                                "Verification email sent. Please verify your email address.",
+                                                Toast.LENGTH_LONG
+                                            ).show()
 
-                                        val intent = Intent(this, Log_In_Activity::class.java)
+                                            val intent = Intent(this, Log_In_Activity::class.java)
 
-                                        val job = when (jobSpinner.selectedItemPosition) {
-                                            0 -> Developer
-                                            1 -> Designer
-                                            2 -> Tester
-                                            else -> Developer // Default value if position is not recognized
+                                            val job = when (jobSpinner.selectedItemPosition) {
+                                                0 -> Developer
+                                                1 -> Designer
+                                                2 -> Tester
+                                                else -> Developer // Default value if position is not recognized
+                                            }
+                                            SaveEmail(email,firstName)
+                                            val usersCollection =
+                                                FirebaseFirestore.getInstance().collection("users")
+                                            val user = hashMapOf(
+                                                "email" to email,
+                                                "firstName" to firstName,
+                                                "lastName" to lastName,
+                                                "job" to job
+                                            )
+
+                                            usersCollection.document(currentUser.uid).set(user)
+                                                .addOnSuccessListener {
+                                                    uploadPhotoToStorage(currentUser.uid)
+                                                }
+                                                .addOnFailureListener { exception ->
+                                                    Toast.makeText(
+                                                        this,
+                                                        "Failed to save user data: ${exception.message}",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                        } else {
+                                            Toast.makeText(
+                                                this,
+                                                "Failed to send verification email.",
+                                                Toast.LENGTH_LONG
+                                            ).show()
                                         }
-
-                                        val usersCollection = FirebaseFirestore.getInstance().collection("users")
-                                        val user = hashMapOf(
-                                            "email" to email,
-                                            "firstName" to firstName,
-                                            "lastName" to lastName,
-                                            "job" to job
-                                        )
-
-                                        usersCollection.document(currentUser.uid).set(user)
-                                            .addOnSuccessListener {
-                                                uploadPhotoToStorage(currentUser.uid)
-                                            }
-                                            .addOnFailureListener { exception ->
-                                                Toast.makeText(
-                                                    this,
-                                                    "Failed to save user data: ${exception.message}",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                    } else {
-                                        Toast.makeText(
-                                            this,
-                                            "Failed to send verification email.",
-                                            Toast.LENGTH_LONG
-                                        ).show()
                                     }
-                                }
                             } else {
                                 Toast.makeText(
                                     this,
@@ -154,10 +160,15 @@ class Sign_Up_Activity : AppCompatActivity() {
                     ).show()
                 }
             } else {
-                Toast.makeText(this, "Fill in all the fields and select a photo.", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    "Fill in all the fields and select a photo.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
+
 
     private fun uploadPhotoToStorage(userId: String) {
         val storageReference = FirebaseStorage.getInstance().reference
@@ -183,8 +194,36 @@ class Sign_Up_Activity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { exception ->
-                Toast.makeText(this, "Failed to upload photo: ${exception.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Failed to upload photo: ${exception.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
-}
 
+    private fun SaveEmail(email: String, firstname:String) {
+        val databaseRef = FirebaseDatabase.getInstance().reference
+            .child("AllEmails").child(encodeEmail(email))
+
+        val requestFriend = AllEmails(email,firstname)
+        val requestMap = requestFriend.toMap()
+
+        databaseRef.setValue(requestMap).addOnCompleteListener { databaseTask ->
+            if (databaseTask.isSuccessful) {
+                Toast.makeText(this, "Email saved successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Failed to save email: ${databaseTask.exception?.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun encodeEmail(email: String): String {
+        return email.replace(".", "-")
+    }
+
+}

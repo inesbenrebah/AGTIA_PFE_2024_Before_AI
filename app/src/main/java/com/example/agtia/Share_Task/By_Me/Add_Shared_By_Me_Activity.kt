@@ -11,6 +11,7 @@ import com.example.agtia.Share_Task.Main_Share.Add_Sharing_Task
 import com.example.agtia.databinding.ActivityAddSharedByMeBinding
 import com.example.agtia.todofirst.Data.GotDeleted
 import com.example.agtia.todofirst.Data.GotFinished
+import com.example.agtia.todofirst.Data.RatingStars
 import com.example.agtia.todofirst.Data.ShareData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -146,6 +147,7 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
                         Log.d("test","email TO${ auth.currentUser?.email}")
                         val task = taskSnapshot.child("task").getValue(String::class.java) ?: ""
                         val date = taskSnapshot.child("date").getValue(String::class.java) ?: ""
+                        val rating = taskSnapshot.child("rating").getValue(Float::class.java) ?: 0.0F
                         val enco=encodeEmail(emailTo)
                         Log.d("test","eenco ${enco}")
                         Log.d("test","eenco ${encodedCurrentUserEmail}")
@@ -156,7 +158,8 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
                                 emailFrom,
                                 emailTo,
                                 task,
-                                date
+                                date,
+                                rating
                             )
                             bList.add(shareData)}}
 
@@ -186,9 +189,12 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
         val currentuser=auth.currentUser?.email
         val encodedCurrentUserEmail = currentuser?.let { encodeEmail(it) }
         Log.d("removee nosnos","inti ${currentuser} w hedha coded ${encodedCurrentUserEmail}")
-        Log.d("removee nosnos","w hedhi el id taa task${shareData.emailFrom}")
-       sendDeletedTask(shareData)
+        Log.d("removee nosnos","w hedhi el email from ${shareData.emailFrom}")
+        Log.d("removee nosnos","w hedhi el email to  ${shareData.emailTo}")
+        Log.d("removee nosnos","w hedhi el id  ${shareData.taskId}")
 
+        sendDeletedTask(shareData)
+if (shareData.approve ==  true){
         if (encodedCurrentUserEmail != null) {
             databaseRef2.child(encodedCurrentUserEmail).child(shareData.emailFrom).removeValue().addOnCompleteListener {
                 if (it.isSuccessful) {
@@ -202,15 +208,15 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
         databaseRef1.child(tr).child(shareData.emailFrom).removeValue().addOnCompleteListener {
             if (it.isSuccessful) {
                 Log.d("removee nosnos","theb tnahi mn and ${tr} el task ${shareData.emailFrom}")
-
+/*
                 val decode =tr?.let { decodeEmail(it) }
-                sendEmail(decode.toString(),encodedCurrentUserEmail.toString())
+                sendEmail(decode.toString(),encodedCurrentUserEmail.toString())*/
 
                 Toast.makeText(this@Add_Shared_By_Me_Activity, "Deleted Successfully", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this@Add_Shared_By_Me_Activity, it.exception?.message, Toast.LENGTH_SHORT).show()
             }
-        }
+        }}
     }
     private fun sendEmail(email: String,ts:String) {
         val data = hashMapOf(
@@ -233,7 +239,7 @@ class Add_Shared_By_Me_Activity : AppCompatActivity(), Adapter_Shared_By_Me.ToDo
 private fun sendDeletedTask(toDoData: ShareData){
     val taskId=toDoData.emailTo
     val otheeruser =toDoData.emailFrom
-    val newTaskRef=databaseReference.child("GotDeleted").child(toDoData.taskId).push()
+    val newTaskRef=databaseReference.child("GotDeleted").child(toDoData.taskId).child(toDoData.emailFrom)
     val formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
 
@@ -244,12 +250,14 @@ private fun sendDeletedTask(toDoData: ShareData){
         emailTo = toDoData.taskId,
         taskId = toDoData.emailFrom,
         task=toDoData.task,
-        date=formattedDate
+        date=formattedDate,
+        approve = false,
+        rating = 00.00F
 
     )
     newTaskRef.setValue(newDelete).addOnCompleteListener {
         if (it.isSuccessful) {
-            Toast.makeText(this, "Task added to GotDeleted successfully", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "the request of delete", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, it.exception?.message, Toast.LENGTH_SHORT).show()
         }
@@ -263,5 +271,54 @@ private fun sendDeletedTask(toDoData: ShareData){
     override fun onItemClicked2(toDoData: GotFinished, position: Int) {
         Toast.makeText(this@Add_Shared_By_Me_Activity, " ${toDoData.emailTo} Has Deleted The task", Toast.LENGTH_SHORT).show()
     }
+
+    override fun CalculateRating(toDoData: GotFinished, position: Int) {
+        val ratingStarsRef = FirebaseDatabase.getInstance().reference
+            .child("RatingStars").child(toDoData.emailTo)
+
+        ratingStarsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val existingStars = snapshot.child("stars").getValue(Float::class.java) ?: 0.0F
+                val newRating = existingStars + toDoData.rating
+
+                // Save the email along with the stars
+                val emailAndStars = mapOf(
+
+                    "email" to toDoData.emailTo,
+                    "stars" to newRating
+                )
+
+                ratingStarsRef.setValue(emailAndStars).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(this@Add_Shared_By_Me_Activity, "Rating stars updated successfully", Toast.LENGTH_SHORT).show()
+                        adapter2.notifyItemChanged(position)
+
+                        // Delete the task from GotFinished
+                        val currentUserEmail = auth.currentUser?.email
+                        if (currentUserEmail != null) {
+                            val encodedCurrentUserEmail = encodeEmail(currentUserEmail)
+                            val friendListRef = FirebaseDatabase.getInstance().reference
+                                .child("GotFinished").child(encodedCurrentUserEmail)
+                            Log.d("deleteafterrate","   ${toDoData.emailTo}  ,,,  ${toDoData.emailFrom}   ,,, ${toDoData.taskId}")
+                            friendListRef.child(toDoData.emailFrom).removeValue().addOnCompleteListener { deletionTask ->
+                                if (deletionTask.isSuccessful) {
+                                    Toast.makeText(this@Add_Shared_By_Me_Activity, "Task deleted from GotFinished", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(this@Add_Shared_By_Me_Activity, "Failed to delete task from GotFinished", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this@Add_Shared_By_Me_Activity, "Failed to update rating stars", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@Add_Shared_By_Me_Activity, error.message, Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
 
 }

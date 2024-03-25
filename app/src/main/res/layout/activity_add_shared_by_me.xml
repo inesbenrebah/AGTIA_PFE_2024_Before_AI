@@ -7,13 +7,16 @@
     android:background="@drawable/cover__13_"
     tools:context=".Share_Task.By_Me.Add_Shared_By_Me_Activity">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/cover__13_"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="15dp">
+       >
 
         <TextView
             android:layout_width="match_parent"
@@ -30,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:minHeight="230dp"
             android:orientation="horizontal"
             android:scrollbars="horizontal"
             tools:listitem="@layout/horiz" />
@@ -48,7 +52,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:minHeight="150dp"
             tools:listitem="@layout/shared_by_me" />
 
     </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

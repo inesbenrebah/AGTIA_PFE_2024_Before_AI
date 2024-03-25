@@ -2,35 +2,27 @@ package com.example.agtia.Friends
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.agtia.R
-import com.example.agtia.databinding.ActivityAddFreindByEmailBinding
 import com.example.agtia.MyAdapterEmailFriend
-
 import com.example.agtia.todofirst.Data.Friend
 import com.example.agtia.todofirst.Data.User
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
 
 class AddFriends_By_Email_Activity : AppCompatActivity(), MyAdapterEmailFriend.OnDeleteClickListener {
 
     private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
-    private lateinit var MyAdapterEmailFriend: MyAdapterEmailFriend
+    private lateinit var myAdapterEmailFriend: MyAdapterEmailFriend
     private lateinit var userArrayList: ArrayList<User>
-    private lateinit var firebaseAuth: FirebaseAuth
-    private val db = FirebaseFirestore.getInstance()
     private var auth = FirebaseAuth.getInstance()
-
     private lateinit var originalList: List<User>
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,8 +33,8 @@ class AddFriends_By_Email_Activity : AppCompatActivity(), MyAdapterEmailFriend.O
         recyclerView.setHasFixedSize(true)
 
         userArrayList = arrayListOf()
-        MyAdapterEmailFriend = MyAdapterEmailFriend(userArrayList, this)
-        recyclerView.adapter = MyAdapterEmailFriend
+        myAdapterEmailFriend = MyAdapterEmailFriend(userArrayList, this)
+        recyclerView.adapter = myAdapterEmailFriend
 
         fetchUsersFromFirestore()
 
@@ -57,63 +49,60 @@ class AddFriends_By_Email_Activity : AppCompatActivity(), MyAdapterEmailFriend.O
             }
         })
     }
+
     private fun fetchUsersFromFirestore() {
         val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
 
         if (currentUserEmail != null) {
-            val usersRef = FirebaseFirestore.getInstance().collection("users")
+            val usersRef = FirebaseDatabase.getInstance().reference
+                .child("AllEmails")
 
-            usersRef.get().addOnSuccessListener { querySnapshot ->
-            if (!querySnapshot.isEmpty) {
-                originalList = querySnapshot.toObjects(User::class.java)
+            // Reference to MyFriendsList node
+            val friendsListRef = FirebaseDatabase.getInstance().reference
+                .child("MyFriendsList")
+                .child(encodeEmail(currentUserEmail))
 
-                // Encode emails in the original list
-                val encodedOriginalList = originalList.map { user ->
-                    user.copy(email = encodeEmail(user.email ?: ""))
-                }
+            usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val tempList = mutableListOf<User>()
 
-                // Exclude your own email from the list
-                val filteredList = encodedOriginalList.filter { user ->
-                    user.email != encodeEmail(currentUserEmail)
-                }
-
-                // Fetch the list of friends for the current user from MyFriendsList
-                val currentUserFriendsRef = FirebaseDatabase.getInstance().reference
-                    .child("MyFriendsList")
-                    .child(currentUserEmail?.let { encodeEmail(it) }.toString())
-
-                currentUserFriendsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        val currentUserFriendsList = mutableListOf<String>()
-
-                        for (friendSnapshot in dataSnapshot.children) {
-                            friendSnapshot.key?.let { currentUserFriendsList.add(it) }
+                    // Get the list of emails from MyFriendsList
+                    friendsListRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(friendsSnapshot: DataSnapshot) {
+                            for (userSnapshot in dataSnapshot.children) {
+                                val user = userSnapshot.getValue(User::class.java)
+                                val userEmail = user?.email
+                                if (userEmail != null && userEmail != currentUserEmail) {
+                                    // Check if the user's email is not in the friend list
+                                    if (!friendsSnapshot.hasChild(encodeEmail(userEmail))) {
+                                        tempList.add(user)
+                                    } else {
+                                        Log.d("Firebase", "Permission denied to access user: $userEmail")
+                                    }
+                                }
+                            }
+                            // After processing all users, filter the list
+                            originalList = tempList.toList()
+                            myAdapterEmailFriend.filterList(originalList)
                         }
 
-                        // Filter out the emails already in the MyFriendsList
-                        val finalFilteredList = filteredList.filter { user ->
-                            encodeEmail(user.email ?: "") !in currentUserFriendsList
+                        override fun onCancelled(error: DatabaseError) {
+                            Log.e("Firebase", "Failed to fetch user from friend list: ${error.message}")
                         }
-                        originalList = finalFilteredList
+                    })
+                }
 
-                        // Set the filtered list to the adapter
-                        MyAdapterEmailFriend.filterList(finalFilteredList)
-
-                    }
-
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        // Handle error
-                        Toast.makeText(
-                            this@AddFriends_By_Email_Activity,
-                            "Failed to fetch friends: ${databaseError.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                })
-            }
-        }.addOnFailureListener { exception ->
-            Toast.makeText(this, "Failed to fetch users: ${exception.message}", Toast.LENGTH_SHORT).show()
-        }}
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle error
+                    Log.e("Firebase", "Failed to fetch users: ${databaseError.message}")
+                    Toast.makeText(
+                        this@AddFriends_By_Email_Activity,
+                        "Failed to fetch users: ${databaseError.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+        }
     }
 
 
@@ -126,67 +115,26 @@ class AddFriends_By_Email_Activity : AppCompatActivity(), MyAdapterEmailFriend.O
                 it.email?.contains(query, ignoreCase = true) ?: false
             }
         }
-        MyAdapterEmailFriend.filterList(filteredList)
+        myAdapterEmailFriend.filterList(filteredList)
     }
-
 
     override fun sendFriendRequest(email: String) {
         val currentUserEmail = auth.currentUser?.email
 
         // Ensure current user is authenticated
         if (currentUserEmail != null) {
-
-            val db = FirebaseFirestore.getInstance()
-            val usersRef = db.collection("users")
-
-            // Check if the entered email exists in the list of users
-            usersRef.whereEqualTo("email", email).get().addOnSuccessListener { userQuerySnapshot ->
-
-                    // User with the entered email exists
-                    val friendListRef = FirebaseDatabase.getInstance().reference
-                        .child("MyFriendsList")
-                        .child(encodeEmail(email))
-
-                    // Check if the current user exists in the friend's friend list
-                    friendListRef.child(encodeEmail(currentUserEmail)).get()
-                        .addOnCompleteListener { friendCheckTask ->
-                            if (friendCheckTask.isSuccessful) {
-                                val friendExists = friendCheckTask.result?.value != null
-                                if (friendExists) {
-                                    // User is already in the friend's friend list
-                                    Toast.makeText(
-                                        this,
-                                        "User is already in the friend's friend list",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    // Proceed to send the friend request
-                                    sendFriendRequest1(email, currentUserEmail, context =applicationContext)
-                                }
-                            } else {
-                                Toast.makeText(
-                                    this,
-                                    "Failed to check friend's friend list: ${friendCheckTask.exception?.message}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-
-            }.addOnFailureListener { exception ->
-                Toast.makeText(
-                    this,
-                    "Failed to check user: ${exception.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            // Proceed to send the friend request
+            sendFriendRequest1(email, currentUserEmail, applicationContext)
         } else {
-            Toast.makeText(this, "Current user email is null", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@AddFriends_By_Email_Activity, "Current user email is null", Toast.LENGTH_SHORT).show()
         }
-
-
     }
 
+
+
     private fun sendFriendRequest1(email: String, currentUserEmail: String, context: Context) {
+        Log.d("FriendRequest", "Sending friend request to: $email")
+
         val databaseRef = FirebaseDatabase.getInstance().reference
             .child("Friend")
         val newRequestRef = databaseRef.push()
@@ -204,17 +152,19 @@ class AddFriends_By_Email_Activity : AppCompatActivity(), MyAdapterEmailFriend.O
         val requestMap = requestFriend.toMap()
         newRequestRef.setValue(requestMap).addOnCompleteListener { databaseTask ->
             if (databaseTask.isSuccessful) {
+                Log.d("FriendRequest", "Request sent successfully")
                 Toast.makeText(context, "Request sent successfully", Toast.LENGTH_SHORT).show()
             } else {
+                val errorMessage = databaseTask.exception?.message ?: "Unknown error"
+                Log.e("FriendRequest", "Failed to send request: $errorMessage")
                 Toast.makeText(
                     context,
-                    "Failed to send request: ${databaseTask.exception?.message}",
+                    "Failed to send request: $errorMessage",
                     Toast.LENGTH_SHORT
                 ).show()
             }
         }
     }
-
 
     private fun encodeEmail(email: String): String {
         return email.replace(".", "-")

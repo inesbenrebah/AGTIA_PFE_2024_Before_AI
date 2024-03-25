@@ -73,6 +73,8 @@ class AdminActivity : AppCompatActivity(), MyAdapterAdmin.OnDeleteClickListener 
 
     override fun onDeleteClick(email: String) {
         deleteUserByEmail(email)
+        EventChangeListener()
+
     }
 
     private fun deleteUserByEmail(emailToDelete: String) {
@@ -105,7 +107,6 @@ class AdminActivity : AppCompatActivity(), MyAdapterAdmin.OnDeleteClickListener 
                                     }
 
                                 // Refresh the list after deletion
-                                EventChangeListener()
                             }
                             .addOnFailureListener { firestoreError ->
                                 Toast.makeText(this, "Error Deleting User from Firestore: ${firestoreError.message}", Toast.LENGTH_SHORT).show()

@@ -7,48 +7,72 @@
     android:background="@drawable/cover__23_"
     tools:context=".Share_Task.For_Me.Add_Shared_For_Me_Activity">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/cover__13_"
-        android:orientation="vertical"
-        android:layout_marginBottom="15dp">
+        android:layout_height="match_parent">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="60dp"
-            android:text="Tasks That Got Deleted :"
-            android:textColor="#3A3940"
-            android:textSize="20dp"
-            android:textStyle="bold"/>
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_marginTop="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="Tasks That Are Requested to  Got Deleted :"
+                android:textColor="#3A3940"
+                android:textSize="20dp"
+                android:textStyle="bold"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="250dp"
+                android:orientation="horizontal"
+                android:scrollbars="horizontal"
+                tools:listitem="@layout/requested_to_get_deleted" />
+
+            <TextView
+                android:layout_marginTop="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="Tasks That Got Deleted :"
+                android:textColor="#3A3940"
+                android:textSize="20dp"
+                android:textStyle="bold"/>
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            android:scrollbars="horizontal"
-            tools:listitem="@layout/horiz" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:text="They Shared These Tasks With Me :"
-            android:textColor="#3A3940"
-            android:textSize="20dp"
-            android:textStyle="bold"/>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:listitem="@layout/shared_for_me" />
-
-    </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="220dp"
+                android:orientation="horizontal"
+                android:scrollbars="horizontal"
+                tools:listitem="@layout/horiz"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:text="They Shared These Tasks With Me :"
+                android:textColor="#3A3940"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:listitem="@layout/shared_for_me"
+                android:layout_marginBottom="20dp"/>
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

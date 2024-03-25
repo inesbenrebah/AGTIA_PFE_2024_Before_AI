@@ -19,6 +19,12 @@
         android:theme="@style/Theme.AGTIA"
         tools:targetApi="31">
         <activity
+            android:name=".ProfileUser.Rating_Page_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileUser.Confirmation_with_password_activity"
+            android:exported="false" />
+        <activity
             android:name=".ProfileUser.Confirmation_Activity"
             android:exported="false" />
         <activity
@@ -49,6 +55,7 @@
             android:name=".AddTask.AddTask_Activity"
             android:exported="false" />
         <activity android:name=".NoFriends" />
+
         <receiver android:name=".AddTask.AlarmReceiver" />
         <receiver
             android:name=".Authentication.TodoAppWidget"

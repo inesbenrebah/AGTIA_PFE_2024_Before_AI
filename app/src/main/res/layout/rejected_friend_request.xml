@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="200dp"
     app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="8dp"
     app:cardElevation="10dp"
@@ -33,17 +32,6 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/todoTask"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:paddingStart="12dp"
-                android:text="Item 1"
-
-                android:textColor="#6319BD"
-                android:textSize="20sp" />
-
 
             <TextView
                 android:id="@+id/todoDate"
@@ -53,12 +41,6 @@
                 android:text="Date: "
                 android:textColor="#A589C8"
                 android:textSize="18sp" />
-
-            <RatingBar
-                android:id="@+id/ratingBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5" />
 
 
         </LinearLayout>

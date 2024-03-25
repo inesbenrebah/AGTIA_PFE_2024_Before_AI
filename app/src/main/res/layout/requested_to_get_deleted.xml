@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="200dp"
     app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="8dp"
     app:cardElevation="10dp"
@@ -54,12 +53,15 @@
                 android:textColor="#A589C8"
                 android:textSize="18sp" />
 
-            <RatingBar
-                android:id="@+id/ratingBar"
+            <Button
+                android:id="@+id/button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5" />
-
+                android:layout_height="60dp"
+                android:backgroundTint="#771717"
+                android:textSize="25sp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:text="Approve" />
 
         </LinearLayout>
 

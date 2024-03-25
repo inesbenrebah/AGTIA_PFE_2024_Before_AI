@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/cover__20_"
+    android:background="@drawable/image_33"
     android:orientation="vertical"
     tools:context=".ProfileUser.Profile_Fragment">
 
@@ -68,52 +68,73 @@
     </LinearLayout>
 
 
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="Settings"
-            android:layout_marginTop="30dp"
-            android:textColor="#211C70"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:text="Settings"
+        android:textColor="#211C70"
+        android:textSize="30sp"
+        android:textStyle="bold" />
 
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:orientation="vertical">
 
         <Button
             android:id="@+id/edit_profile_button"
-            android:layout_width="410dp"
+            android:layout_width="350dp"
             android:layout_height="50dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="28dp"
+
+
             android:backgroundTint="#B7BAF6"
-            android:text=" Edit My Account           >"
+            android:text=" Edit My Account"
             android:textColor="@android:color/white"
             android:textSize="25dp" />
 
         <Button
             android:id="@+id/MyFriends"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
             android:backgroundTint="#B7BAF6"
-            android:text="My Friends List             >"
+            android:text="My Friends List"
+
+            android:textColor="@android:color/white"
+            android:textSize="25dp" />
+        <Button
+            android:id="@+id/rating_page_button"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
+            android:backgroundTint="#B7BAF6"
+            android:text="Ratings"
             android:textColor="@android:color/white"
             android:textSize="25dp" />
 
         <Button
             android:id="@+id/delete_account_button"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
             android:backgroundTint="#B7BAF6"
-
-            android:text="Delete My  Account      >"
+            android:text="Delete My  Account"
+            android:textColor="@android:color/white"
+            android:textSize="25dp" />
+        <Button
+            android:id="@+id/Log_out_account_button"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
+            android:backgroundTint="#CA7770"
+            android:text="Log Out"
             android:textColor="@android:color/white"
             android:textSize="25dp" />
     </LinearLayout>

@@ -18,7 +18,9 @@ data class ShareData(
     var priority: Priority = Priority.NORMAL,
     var reminderTime: Long = -1, // in milliseconds
     var formattedReminderTime: String = "", // formatted reminder time
-    var iconResource: Int = -1 // resource ID of the associated icon, -1 means no icon
+    var iconResource: Int = -1 ,
+    var approve:Boolean=false
+// resource ID of the associated icon, -1 means no icon
 ) : Parcelable {
 
     fun toMap(): Map<String, Any?> {
@@ -35,7 +37,8 @@ data class ShareData(
             "done" to done,
             "priority" to priority.name, // Store priority as string in the database
             "reminderTime" to reminderTime, // Store reminder time
-            "iconResource" to iconResource // Store icon resource ID
+            "iconResource" to iconResource,
+            "approve" to approve// Store icon resource ID
         )
     }
 }

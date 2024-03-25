@@ -1,10 +1,9 @@
 package com.example.agtia.todofirst.Data
 
-data class GotFinished(
+data class RequestDelete(
     var emailFrom: String = "",
     var emailTo: String = "",
-    var taskId: String = "",
+    var approve: Boolean=false,
     var task: String = "",
-    var date: String = "",
-    var rating: Float
+    var date: String = ""
 )

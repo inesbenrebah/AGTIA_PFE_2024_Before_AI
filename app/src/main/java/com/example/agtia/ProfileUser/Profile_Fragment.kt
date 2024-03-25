@@ -26,6 +26,8 @@ class Profile_Fragment : Fragment() {
     private lateinit var userJob: TextView
     private lateinit var editProfileButton: Button
     private lateinit var deleteAccountButton: Button
+    private lateinit var logout:Button
+    private lateinit var rating:Button
     private lateinit var friendsListButton: Button
     private lateinit var friendsRecyclerView: RecyclerView
     private lateinit var friendsAdapter: Profile_Adapter
@@ -45,10 +47,11 @@ class Profile_Fragment : Fragment() {
         userName = view.findViewById(R.id.user_name)
         userEmail = view.findViewById(R.id.user_email)
         userJob = view.findViewById(R.id.user_job)
+        rating=view.findViewById(R.id.rating_page_button)
         friendsListButton=view.findViewById(R.id.MyFriends)
         editProfileButton = view.findViewById(R.id.edit_profile_button)
         deleteAccountButton = view.findViewById(R.id.delete_account_button)
-
+      logout=view.findViewById(R.id.Log_out_account_button)
 
         // Retrieve user data from Firestore
         currentUser?.uid?.let { uid ->
@@ -87,10 +90,16 @@ class Profile_Fragment : Fragment() {
         deleteAccountButton.setOnClickListener {
             val intent = Intent(requireActivity(), Confirmation_Activity::class.java)
             startActivity(intent)
+
         }
-
-
-
+logout.setOnClickListener {
+    val intent = Intent(requireActivity(), Log_In_Activity::class.java)
+    startActivity(intent)
+}
+rating.setOnClickListener {
+    val intent = Intent(requireActivity(), Rating_Page_Activity::class.java)
+    startActivity(intent)
+}
 
         return view
     }

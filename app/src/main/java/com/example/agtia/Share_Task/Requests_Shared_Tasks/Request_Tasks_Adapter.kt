@@ -43,6 +43,7 @@ class Request_Tasks_Adapter(private val list: MutableList<ShareData>,private val
         holder.binding.apply {
             RequestFrom.text = currentItem.emailTo
             todoTask.text = currentItem.task
+            todoDesc.text=currentItem.desc
             val imageView = todoImage
             if (!currentItem.userPhotoUrl.isNullOrEmpty()) {
                 Glide.with(root.context)
